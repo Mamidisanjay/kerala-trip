@@ -13,13 +13,16 @@ Kerala journey landing page built with React + Vite.
 
 ## Deploy To GitHub Pages
 
-This project is configured for GitHub Pages deployment.
+This project is configured for automatic GitHub Pages deployment using GitHub Actions.
 
-1. Push this project to a GitHub repository.
-2. Run:
-	npm run deploy
-3. In GitHub repository settings, open `Pages` and set source to `gh-pages` branch.
-4. Your site URL will be:
+1. In GitHub repository settings, open `Pages` and set source to `GitHub Actions`.
+2. In GitHub repository settings, open `Secrets and variables` > `Actions` and add:
+	- `VITE_SUPABASE_URL`
+	- `VITE_SUPABASE_ANON_KEY`
+	- `VITE_SUPABASE_BUCKET` (example: `trip-memories`)
+3. Push to `main` branch.
+4. GitHub Actions will build and deploy automatically.
+5. Your site URL will be:
 	`https://<your-username>.github.io/<your-repo-name>/`
 
 ## Base Path Notes
