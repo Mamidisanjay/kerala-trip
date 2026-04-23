@@ -943,6 +943,10 @@ nav {
   font-size: 0.82rem;
 }
 
+.upload-strip input[type='file']:disabled {
+  opacity: 0.55;
+}
+
 .upload-strip button {
   border: 1px solid rgba(212, 168, 83, 0.35);
   background: rgba(212, 168, 83, 0.12);
@@ -957,6 +961,11 @@ nav {
 
 .upload-strip button:hover {
   background: rgba(212, 168, 83, 0.2);
+}
+
+.upload-strip button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .lightbox {

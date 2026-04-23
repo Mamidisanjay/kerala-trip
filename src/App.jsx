@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
+import { PHOTO_FOLDER, SUPABASE_BUCKET, isSupabaseEnabled, supabase } from './lib/supabaseClient'
 import './App.css'
 
 const DEPARTURE = new Date('2026-05-22T03:50:00+05:30')
@@ -261,12 +262,34 @@ async function toCompressedDataUrl(file) {
   })
 }
 
+function dataUrlToBlob(dataUrl) {
+  const [meta, b64] = dataUrl.split(',')
+  const mime = meta.match(/data:(.*?);base64/)?.[1] || 'image/jpeg'
+  const binary = atob(b64)
+  const array = new Uint8Array(binary.length)
+  for (let i = 0; i < binary.length; i += 1) {
+    array[i] = binary.charCodeAt(i)
+  }
+  return new Blob([array], { type: mime })
+}
+
+function toSafeFileStem(name) {
+  const base = name.replace(/\.[^.]+$/, '')
+  return base.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 40) || 'photo'
+}
+
+function buildRemotePath(file, idx) {
+  const stamp = Date.now()
+  return `${PHOTO_FOLDER}/${stamp}-${idx}-${toSafeFileStem(file.name)}.jpg`
+}
+
 function App() {
   const [now, setNow] = useState(() => new Date())
   const [activeStop, setActiveStop] = useState(0)
   const [navSolid, setNavSolid] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [uploadedPhotos, setUploadedPhotos] = useState(() => {
+    if (isSupabaseEnabled) return []
     if (typeof window === 'undefined') return []
 
     try {
@@ -303,6 +326,12 @@ function App() {
   const [moonTapCount, setMoonTapCount] = useState(0)
   const [meteorShower, setMeteorShower] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(null)
+  const [isUploading, setIsUploading] = useState(false)
+  const [syncMessage, setSyncMessage] = useState(
+    isSupabaseEnabled
+      ? 'Cloud sync is enabled. Photos are shared across devices.'
+      : 'Cloud sync is disabled. Photos are saved only on this browser.',
+  )
   const fileInputRef = useRef(null)
   const touchStartXRef = useRef(null)
 
@@ -344,12 +373,51 @@ function App() {
   }, [])
 
   useEffect(() => {
+    if (isSupabaseEnabled) return
     try {
       window.localStorage.setItem(MEMORY_STORAGE_KEY, JSON.stringify(uploadedPhotos))
     } catch {
       // Ignore storage quota errors and keep in-memory state.
     }
   }, [uploadedPhotos])
+
+  useEffect(() => {
+    if (!isSupabaseEnabled || !supabase) return
+
+    const loadCloudPhotos = async () => {
+      const { data, error } = await supabase.storage
+        .from(SUPABASE_BUCKET)
+        .list(PHOTO_FOLDER, {
+          limit: MAX_MEMORY_PHOTOS,
+          offset: 0,
+          sortBy: { column: 'name', order: 'desc' },
+        })
+
+      if (error) {
+        setSyncMessage('Cloud sync configured, but loading failed. Check bucket and policies.')
+        return
+      }
+
+      const mapped = (data || [])
+        .filter((item) => item.name)
+        .slice(0, MAX_MEMORY_PHOTOS)
+        .map((item, idx) => {
+          const fullPath = `${PHOTO_FOLDER}/${item.name}`
+          const { data: publicData } = supabase.storage.from(SUPABASE_BUCKET).getPublicUrl(fullPath)
+          return {
+            id: `${item.id || item.name}-${idx}`,
+            name: item.name,
+            url: publicData.publicUrl,
+            path: fullPath,
+          }
+        })
+
+      setUploadedPhotos(mapped)
+      setSyncMessage('Cloud sync is enabled. Photos are shared across devices.')
+    }
+
+    loadCloudPhotos()
+  }, [])
 
   useEffect(() => {
     window.localStorage.setItem(MOOD_STORAGE_KEY, mood)
@@ -451,29 +519,92 @@ function App() {
     const files = Array.from(event.target.files || [])
     if (!files.length) return
 
-    const mapped = await Promise.all(
-      files.map(async (file, idx) => {
-        const compressedUrl = await toCompressedDataUrl(file)
-        return {
-          id: `${file.name}-${file.lastModified}-${Date.now()}-${idx}`,
-          name: file.name,
-          url: compressedUrl,
+    setIsUploading(true)
+
+    try {
+      if (isSupabaseEnabled && supabase) {
+        const selected = files.slice(0, MAX_MEMORY_PHOTOS)
+        for (let idx = 0; idx < selected.length; idx += 1) {
+          const file = selected[idx]
+          const compressedUrl = await toCompressedDataUrl(file)
+          const blob = dataUrlToBlob(compressedUrl)
+          const remotePath = buildRemotePath(file, idx)
+
+          const { error } = await supabase.storage.from(SUPABASE_BUCKET).upload(remotePath, blob, {
+            contentType: 'image/jpeg',
+            upsert: false,
+          })
+
+          if (error) {
+            setSyncMessage('Upload failed for one or more images. Check bucket permissions.')
+            continue
+          }
         }
-      }),
-    )
 
-    setUploadedPhotos((prev) => {
-      return [...prev, ...mapped].slice(0, memorySlots.length)
-    })
+        const { data, error } = await supabase.storage
+          .from(SUPABASE_BUCKET)
+          .list(PHOTO_FOLDER, {
+            limit: MAX_MEMORY_PHOTOS,
+            offset: 0,
+            sortBy: { column: 'name', order: 'desc' },
+          })
 
-    input.value = ''
+        if (!error) {
+          const mapped = (data || [])
+            .filter((item) => item.name)
+            .slice(0, MAX_MEMORY_PHOTOS)
+            .map((item, idx) => {
+              const fullPath = `${PHOTO_FOLDER}/${item.name}`
+              const { data: publicData } = supabase.storage.from(SUPABASE_BUCKET).getPublicUrl(fullPath)
+              return {
+                id: `${item.id || item.name}-${idx}`,
+                name: item.name,
+                url: publicData.publicUrl,
+                path: fullPath,
+              }
+            })
+          setUploadedPhotos(mapped)
+        }
+      } else {
+        const mapped = await Promise.all(
+          files.map(async (file, idx) => {
+            const compressedUrl = await toCompressedDataUrl(file)
+            return {
+              id: `${file.name}-${file.lastModified}-${Date.now()}-${idx}`,
+              name: file.name,
+              url: compressedUrl,
+            }
+          }),
+        )
+
+        setUploadedPhotos((prev) => {
+          return [...prev, ...mapped].slice(0, memorySlots.length)
+        })
+      }
+    } finally {
+      setIsUploading(false)
+      input.value = ''
+    }
   }
 
   const clearUploads = () => {
-    setUploadedPhotos([])
-    window.localStorage.removeItem(MEMORY_STORAGE_KEY)
-    setLightboxIndex(null)
-    if (fileInputRef.current) fileInputRef.current.value = ''
+    const clear = async () => {
+      if (isSupabaseEnabled && supabase) {
+        const { data } = await supabase.storage.from(SUPABASE_BUCKET).list(PHOTO_FOLDER, { limit: 100 })
+        const targets = (data || []).filter((item) => item.name).map((item) => `${PHOTO_FOLDER}/${item.name}`)
+        if (targets.length) {
+          await supabase.storage.from(SUPABASE_BUCKET).remove(targets)
+        }
+      } else {
+        window.localStorage.removeItem(MEMORY_STORAGE_KEY)
+      }
+
+      setUploadedPhotos([])
+      setLightboxIndex(null)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+
+    clear()
   }
 
   const bannerVisible = phase === 'journey'
@@ -1185,11 +1316,14 @@ function App() {
           </div>
 
           <div className="upload-strip reveal">
-            <p>Add your own trip pictures here. You can upload up to 9 photos, and they will appear in the memory slots below. They are saved in this browser on this device.</p>
+            <p>
+              Add your own trip pictures here. You can upload up to 9 photos, and they will appear in the memory slots below.
+              {` ${syncMessage}`}
+            </p>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-              <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleUpload} />
-              <button type="button" onClick={clearUploads}>
-                Clear Photos
+              <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleUpload} disabled={isUploading} />
+              <button type="button" onClick={clearUploads} disabled={isUploading}>
+                {isUploading ? 'Uploading...' : 'Clear Photos'}
               </button>
             </div>
           </div>
