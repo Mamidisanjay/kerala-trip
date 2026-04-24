@@ -19,6 +19,7 @@ const LOCATIONS = [
   { name: 'Return Vijayawada', emoji: '🏡', coords: [16.5193, 80.6305], color: '#f87171' },
 ]
 
+const ROUTE_COLORS = ['#38bdf8', '#34d399', '#f59e0b', '#fb7185']
 const ROUTE_POINTS = LOCATIONS.map((place) => place.coords)
 
 function createEmojiIcon(emoji) {
@@ -29,6 +30,42 @@ function createEmojiIcon(emoji) {
     iconAnchor: [12, 12],
     popupAnchor: [0, -14],
   })
+}
+
+function buildCurvePoints(from, to, bend = 0.36, samples = 28) {
+  const [x1, y1] = from
+  const [x2, y2] = to
+  const mx = (x1 + x2) / 2
+  const my = (y1 + y2) / 2
+  const dx = x2 - x1
+  const dy = y2 - y1
+  const cLat = mx - dy * bend
+  const cLng = my + dx * bend
+
+  const out = []
+  for (let step = 0; step <= samples; step += 1) {
+    const t = step / samples
+    const one = 1 - t
+    const lat = one * one * x1 + 2 * one * t * cLat + t * t * x2
+    const lng = one * one * y1 + 2 * one * t * cLng + t * t * y2
+    out.push([lat, lng])
+  }
+  return out
+}
+
+function buildCurvedSegments(points) {
+  return points.slice(0, -1).map((point, idx) => {
+    const segment = buildCurvePoints(point, points[idx + 1], idx % 2 === 0 ? 0.34 : -0.3)
+    return {
+      id: `${idx}-${idx + 1}`,
+      points: segment,
+      color: ROUTE_COLORS[idx % ROUTE_COLORS.length],
+    }
+  })
+}
+
+function flattenSegments(segments) {
+  return segments.flatMap((segment, idx) => (idx === 0 ? segment.points : segment.points.slice(1)))
 }
 
 function toSegmentLengths(points) {
@@ -128,7 +165,9 @@ function RealMap() {
   const [drawProgress, setDrawProgress] = useState(0)
   const [dotProgress, setDotProgress] = useState(0)
 
-  const { lengths, total } = useMemo(() => toSegmentLengths(ROUTE_POINTS), [])
+  const routeSegments = useMemo(() => buildCurvedSegments(ROUTE_POINTS), [])
+  const animatedTrack = useMemo(() => flattenSegments(routeSegments), [routeSegments])
+  const { lengths, total } = useMemo(() => toSegmentLengths(animatedTrack), [animatedTrack])
 
   const totalKm = useMemo(() => {
     let sum = 0
@@ -140,7 +179,7 @@ function RealMap() {
 
   useEffect(() => {
     let frame = null
-    const duration = 2600
+    const duration = 3100
     const start = performance.now()
 
     const animate = (time) => {
@@ -173,13 +212,13 @@ function RealMap() {
   }, [])
 
   const partialRoute = useMemo(
-    () => getPartialRoute(ROUTE_POINTS, lengths, total, drawProgress),
-    [drawProgress, lengths, total],
+    () => getPartialRoute(animatedTrack, lengths, total, drawProgress),
+    [animatedTrack, drawProgress, lengths, total],
   )
 
   const movingPoint = useMemo(
-    () => getPointAtProgress(ROUTE_POINTS, lengths, total, dotProgress),
-    [dotProgress, lengths, total],
+    () => getPointAtProgress(animatedTrack, lengths, total, dotProgress),
+    [animatedTrack, dotProgress, lengths, total],
   )
 
   return (
@@ -204,26 +243,29 @@ function RealMap() {
           url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
         />
 
-        <Polyline
-          positions={ROUTE_POINTS}
-          pathOptions={{
-            color: '#334155',
-            weight: 6,
-            opacity: 0.55,
-            lineCap: 'round',
-            lineJoin: 'round',
-          }}
-        />
+        {routeSegments.map((segment) => (
+          <Polyline
+            key={`base-${segment.id}`}
+            positions={segment.points}
+            pathOptions={{
+              color: segment.color,
+              weight: 6,
+              opacity: 0.68,
+              lineCap: 'round',
+              lineJoin: 'round',
+            }}
+          />
+        ))}
 
         <Polyline
           positions={partialRoute}
           pathOptions={{
-            color: '#d4a853',
-            weight: 4,
-            opacity: 0.95,
+            color: '#fef3c7',
+            weight: 4.5,
+            opacity: 0.98,
             lineCap: 'round',
             lineJoin: 'round',
-            dashArray: '10 8',
+            dashArray: '8 8',
           }}
         />
 

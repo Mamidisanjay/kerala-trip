@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react'
 import Carousel from './Carousel'
 
 const GALLERY_STORAGE_KEY = 'kerala-gallery-v1'
-const MAX_PER_CATEGORY = 9
 
 const CATEGORIES = [
   'Arrival Dawn',
@@ -62,7 +61,7 @@ function Gallery() {
       const existing = current[selectedCategory] || []
       return {
         ...current,
-        [selectedCategory]: [...existing, ...encoded].slice(0, MAX_PER_CATEGORY),
+        [selectedCategory]: [...existing, ...encoded],
       }
     })
 
@@ -107,7 +106,7 @@ function Gallery() {
               onClick={() => setSelectedCategory(category)}
             >
               <span>{category}</span>
-              <span>{count}/{MAX_PER_CATEGORY}</span>
+              <span>{count} photos</span>
             </button>
           )
         })}

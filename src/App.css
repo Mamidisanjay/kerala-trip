@@ -1330,6 +1330,138 @@ nav {
   padding: 12px;
 }
 
+.trip-carousel-shell {
+  padding: 24px;
+  border-color: rgba(56, 189, 248, 0.22);
+  background:
+    radial-gradient(circle at 0% 0%, rgba(56, 189, 248, 0.08), transparent 38%),
+    radial-gradient(circle at 100% 0%, rgba(251, 113, 133, 0.08), transparent 42%),
+    rgba(8, 13, 28, 0.58);
+}
+
+.trip-carousel-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.trip-carousel-title {
+  margin: 0;
+  color: #f8fafc;
+  font-family: 'Cinzel', serif;
+  font-size: 1.16rem;
+  letter-spacing: 0.03em;
+}
+
+.trip-carousel-sub {
+  margin-top: 8px;
+  color: #94a3b8;
+  font-size: 0.84rem;
+}
+
+.trip-carousel-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.trip-carousel-controls input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.trip-upload-btn,
+.trip-carousel-controls button {
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  background: rgba(15, 23, 42, 0.66);
+  color: #e2e8f0;
+  padding: 8px 14px;
+  font-size: 0.76rem;
+  cursor: pointer;
+}
+
+.trip-upload-btn {
+  border-color: rgba(56, 189, 248, 0.4);
+  background: rgba(56, 189, 248, 0.15);
+}
+
+.trip-carousel-meta {
+  margin-top: 14px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 0.75rem;
+  color: #93c5fd;
+}
+
+.trip-carousel-stage {
+  margin-top: 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: rgba(2, 6, 23, 0.55);
+  padding: 10px;
+  cursor: pointer;
+}
+
+.trip-thumb-strip {
+  margin-top: 14px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 8px;
+  border-radius: 14px;
+  border: 1px dashed rgba(148, 163, 184, 0.32);
+  background: rgba(15, 23, 42, 0.38);
+}
+
+.trip-thumb-strip::-webkit-scrollbar {
+  height: 8px;
+}
+
+.trip-thumb-strip::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.35);
+  border-radius: 999px;
+}
+
+.trip-thumb-tile {
+  min-width: 84px;
+  width: 84px;
+  height: 84px;
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  overflow: hidden;
+  padding: 0;
+  transform: rotate(calc(var(--tilt, 0deg)));
+  background: #0f172a;
+}
+
+.trip-thumb-tile:nth-child(odd) {
+  --tilt: -2deg;
+}
+
+.trip-thumb-tile:nth-child(even) {
+  --tilt: 2deg;
+}
+
+.trip-thumb-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.trip-thumb-empty {
+  color: #94a3b8;
+  font-size: 0.82rem;
+  margin: 4px;
+}
+
 .leaflet-container {
   background: #08121d;
   font-family: 'DM Sans', sans-serif;
@@ -1481,6 +1613,20 @@ nav {
 
   .gallery-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .trip-carousel-controls {
+    width: 100%;
+  }
+
+  .trip-upload-btn,
+  .trip-carousel-controls button {
+    flex: 1 1 100%;
+    text-align: center;
+  }
+
+  .trip-carousel-stage .premium-main-slide {
+    width: 86%;
   }
 
   .hub-card {

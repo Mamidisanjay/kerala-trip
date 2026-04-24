@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
 import Gallery from './components/Gallery'
 import RealMap from './components/RealMap'
+import TripCarouselBuilder from './components/TripCarouselBuilder'
 import { PHOTO_FOLDER, SUPABASE_BUCKET, isSupabaseEnabled, supabase } from './lib/supabaseClient'
 import './App.css'
 
@@ -1219,7 +1220,7 @@ function App() {
             </p>
           </div>
 
-          <div className="upload-strip reveal">
+          <div className="upload-strip reveal" style={{ display: 'none' }} aria-hidden="true">
             <p>
               Add your own trip pictures here. You can upload up to 9 photos, and they will appear in the memory slots below.
             </p>
@@ -1235,7 +1236,7 @@ function App() {
             </div>
           </div>
 
-          <div className="reveal memory-grid" style={{ marginTop: 18 }}>
+          <div className="reveal memory-grid" style={{ display: 'none', marginTop: 18 }} aria-hidden="true">
             {memorySlots.map((slot, idx) => {
               const photo = uploadedPhotos[idx]
               return (
@@ -1265,6 +1266,10 @@ function App() {
 
           <div className="reveal" style={{ marginTop: 28 }}>
             <Gallery />
+          </div>
+
+          <div className="reveal" style={{ marginTop: 26 }}>
+            <TripCarouselBuilder />
           </div>
         </div>
       </section>
