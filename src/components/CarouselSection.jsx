@@ -20,7 +20,7 @@ function readFileAsDataUrl(file) {
 function cardStyle(offset) {
   if (offset === 0) {
     return {
-      transform: 'translate(-50%, -50%) translateX(0px) translateY(0px) scale(1) rotateY(0deg)',
+      transform: 'translate(-50%, -50%) translateX(0px) translateY(-8px) scale(1) rotateY(0deg)',
       opacity: 1,
       zIndex: 8,
     }
@@ -28,31 +28,31 @@ function cardStyle(offset) {
 
   if (offset === -1) {
     return {
-      transform: 'translate(-50%, -50%) translateX(-260px) translateY(44px) scale(0.84) rotateY(18deg)',
-      opacity: 0.86,
+      transform: 'translate(-50%, -50%) translateX(-300px) translateY(68px) scale(0.82) rotateY(22deg)',
+      opacity: 0.8,
       zIndex: 6,
     }
   }
 
   if (offset === 1) {
     return {
-      transform: 'translate(-50%, -50%) translateX(260px) translateY(44px) scale(0.84) rotateY(-18deg)',
-      opacity: 0.86,
+      transform: 'translate(-50%, -50%) translateX(300px) translateY(68px) scale(0.82) rotateY(-22deg)',
+      opacity: 0.8,
       zIndex: 6,
     }
   }
 
   if (offset === -2) {
     return {
-      transform: 'translate(-50%, -50%) translateX(-440px) translateY(110px) scale(0.65) rotateY(26deg)',
-      opacity: 0.42,
+      transform: 'translate(-50%, -50%) translateX(-520px) translateY(138px) scale(0.6) rotateY(30deg)',
+      opacity: 0.34,
       zIndex: 4,
     }
   }
 
   return {
-    transform: 'translate(-50%, -50%) translateX(440px) translateY(110px) scale(0.65) rotateY(-26deg)',
-    opacity: 0.42,
+    transform: 'translate(-50%, -50%) translateX(520px) translateY(138px) scale(0.6) rotateY(-30deg)',
+    opacity: 0.34,
     zIndex: 4,
   }
 }
@@ -137,7 +137,7 @@ function CarouselSection() {
   }
 
   return (
-    <section className="memories-carousel-full" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+    <section className="memories-carousel-full cinematic" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
       <div className="memories-carousel-bg" aria-hidden="true">
         <span>MEMORIES</span>
       </div>

@@ -1,15 +1,14 @@
+const INDIA_MAP_IMAGE = 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/India_location_map.svg/1280px-India_location_map.svg.png'
+
 const LOCATIONS = {
-  vijayawada: { x: 70, y: 45, label: 'Vijayawada' },
-  kochi: { x: 45, y: 75, label: 'Kochi' },
-  munnar: { x: 50, y: 65, label: 'Munnar' },
-  alleppey: { x: 48, y: 80, label: 'Alleppey' },
+  vijayawada: { x: 67.5, y: 50.5, label: 'Vijayawada' },
+  kochi: { x: 49.2, y: 80.2, label: 'Kochi' },
+  munnar: { x: 50.8, y: 74.8, label: 'Munnar' },
+  alleppey: { x: 49.1, y: 84.1, label: 'Alleppey' },
 }
 
-const INDIA_PATH =
-  'M20 8 L29 10 L38 16 L47 22 L57 28 L64 37 L66 45 L63 54 L58 63 L53 70 L49 78 L44 88 L38 92 L31 88 L25 78 L22 66 L20 54 L18 42 L17 30 L18 18 Z'
-
-const FORWARD_PATH = 'M70 45 C63 53, 53 65, 45 75 C47 71, 49 68, 50 65 C49 69, 48 74, 48 80'
-const RETURN_PATH = 'M45 75 C52 67, 61 55, 70 45'
+const FORWARD_PATH = 'M67.5 50.5 C60 58, 53 70, 49.2 80.2 C49.8 78.5, 50.3 76.8, 50.8 74.8 C50.2 77.6, 49.6 80.8, 49.1 84.1'
+const RETURN_PATH = 'M49.2 80.2 C55 68, 60.8 59, 67.5 50.5'
 
 function getActiveStop(progress) {
   if (progress < 20) return 'vijayawada'
@@ -31,55 +30,55 @@ function JourneyMap({ progress = 0 }) {
 
   return (
     <div className="journey-map-fullbleed">
-      <div className="journey-map-bg-text" aria-hidden="true">INDIA → KERALA</div>
-      <svg
-        viewBox="0 0 100 100"
-        className="journey-map-svg"
-        role="img"
-        aria-label="Journey route from Vijayawada to Kochi, Munnar, Alleppey and return to Vijayawada"
-      >
-        <defs>
-          <linearGradient id="journey-forward-gradient" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#0d9488" />
-            <stop offset="100%" stopColor="#d4a853" />
-          </linearGradient>
-        </defs>
+      <div className="journey-map-stack">
+        <img src={INDIA_MAP_IMAGE} alt="Map of India" className="journey-map-image" loading="lazy" />
+        <svg
+          viewBox="0 0 100 100"
+          className="journey-map-svg overlay"
+          role="img"
+          aria-label="Journey route from Vijayawada to Kochi, Munnar, Alleppey and return to Vijayawada"
+        >
+          <defs>
+            <linearGradient id="journey-forward-gradient" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#0d9488" />
+              <stop offset="100%" stopColor="#d4a853" />
+            </linearGradient>
+          </defs>
 
-        <path d={INDIA_PATH} className="journey-india-outline" />
+          <path d={FORWARD_PATH} className="journey-forward-base" />
+          <path
+            d={FORWARD_PATH}
+            className="journey-forward-progress"
+            pathLength="100"
+            style={{ strokeDasharray: `${safeProgress} 100` }}
+          />
 
-        <path d={FORWARD_PATH} className="journey-forward-base" />
-        <path
-          d={FORWARD_PATH}
-          className="journey-forward-progress"
-          pathLength="100"
-          style={{ strokeDasharray: `${safeProgress} 100` }}
-        />
+          <path d={RETURN_PATH} className="journey-return-path" />
 
-        <path d={RETURN_PATH} className="journey-return-path" />
-
-        {Object.entries(LOCATIONS).map(([id, location]) => {
-          const active = id === activeStop
-          const label = labelProps(id, location.x, location.y)
-          return (
-            <g key={id}>
-              <circle
-                cx={location.x}
-                cy={location.y}
-                r={active ? 2.2 : 1.4}
-                className={`journey-marker ${active ? 'active' : ''}`}
-              />
-              <text
-                x={label.x}
-                y={label.y}
-                textAnchor={label.anchor}
-                className={`journey-label ${active ? 'active' : ''}`}
-              >
-                {location.label}
-              </text>
-            </g>
-          )
-        })}
-      </svg>
+          {Object.entries(LOCATIONS).map(([id, location]) => {
+            const active = id === activeStop
+            const label = labelProps(id, location.x, location.y)
+            return (
+              <g key={id}>
+                <circle
+                  cx={location.x}
+                  cy={location.y}
+                  r={active ? 2.2 : 1.4}
+                  className={`journey-marker ${active ? 'active' : ''}`}
+                />
+                <text
+                  x={label.x}
+                  y={label.y}
+                  textAnchor={label.anchor}
+                  className={`journey-label ${active ? 'active' : ''}`}
+                >
+                  {location.label}
+                </text>
+              </g>
+            )
+          })}
+        </svg>
+      </div>
 
       <div className="journey-map-legend">
         <span><i className="legend-stroke forward" /> Forward Journey</span>
