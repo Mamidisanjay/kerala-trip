@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
 import Gallery from './components/Gallery'
-import RealMap from './components/RealMap'
-import TripCarouselBuilder from './components/TripCarouselBuilder'
+import JourneyMap from './components/JourneyMap'
+import CarouselSection from './components/CarouselSection'
 import { PHOTO_FOLDER, SUPABASE_BUCKET, isSupabaseEnabled, supabase } from './lib/supabaseClient'
 import './App.css'
 
@@ -1191,7 +1191,7 @@ function App() {
       </section>
 
       <section id="map-section" style={{ padding: '60px 20px 80px', position: 'relative', zIndex: 2 }}>
-        <div style={{ maxWidth: 800, margin: '0 auto' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 48 }}>
             <div className="badge" style={{ marginBottom: 16 }}>
               📍 Route Map
@@ -1200,9 +1200,9 @@ function App() {
               The <span>Path</span> Through Paradise
             </h2>
           </div>
-          <div className="reveal">
-            <RealMap />
-          </div>
+        </div>
+        <div className="reveal">
+          <JourneyMap progress={journeyPct} />
         </div>
       </section>
 
@@ -1269,7 +1269,7 @@ function App() {
           </div>
 
           <div className="reveal" style={{ marginTop: 26 }}>
-            <TripCarouselBuilder />
+            <CarouselSection />
           </div>
         </div>
       </section>
