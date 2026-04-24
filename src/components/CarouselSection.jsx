@@ -23,6 +23,7 @@ function CarouselSection() {
     }
   })
   const [stageWidth, setStageWidth] = useState(1000)
+  const [isPaused, setIsPaused] = useState(false)
 
   const stageRef = useRef(null)
   const ringRef = useRef(null)
@@ -61,13 +62,15 @@ function CarouselSection() {
       prev = now
 
       if (!draggingRef.current) {
-        rotationRef.current += (0.24 + velocityRef.current) * dt
-        velocityRef.current *= 0.94
+        if (!isPaused) {
+          rotationRef.current += (0.24 + velocityRef.current) * dt
+        }
+        velocityRef.current *= isPaused ? 0.88 : 0.94
         if (Math.abs(velocityRef.current) < 0.0008) velocityRef.current = 0
       }
 
       if (ringRef.current) {
-        ringRef.current.style.transform = `rotateX(14deg) rotateY(${rotationRef.current}deg)`
+        ringRef.current.style.transform = `rotateX(0deg) rotateY(${rotationRef.current}deg)`
       }
 
       frame = requestAnimationFrame(tick)
@@ -77,7 +80,7 @@ function CarouselSection() {
     return () => {
       if (frame) cancelAnimationFrame(frame)
     }
-  }, [])
+  }, [isPaused])
 
   const onPointerDown = (event) => {
     draggingRef.current = true
@@ -95,7 +98,7 @@ function CarouselSection() {
     velocityRef.current = delta * 0.011
 
     if (ringRef.current) {
-      ringRef.current.style.transform = `rotateX(14deg) rotateY(${rotationRef.current}deg)`
+      ringRef.current.style.transform = `rotateX(0deg) rotateY(${rotationRef.current}deg)`
     }
   }
 
@@ -131,8 +134,8 @@ function CarouselSection() {
     velocityRef.current = 0
   }
 
-  const ringRadius = Math.max(220, Math.min(620, stageWidth * 0.42))
-  const cardWidth = Math.max(180, Math.min(360, stageWidth * 0.26))
+  const ringRadius = Math.max(260, Math.min(760, stageWidth * 0.5))
+  const cardWidth = Math.max(240, Math.min(520, stageWidth * 0.34))
   const cardHeight = Math.round(cardWidth * 0.56)
 
   return (
@@ -151,6 +154,13 @@ function CarouselSection() {
         <div className="memories-carousel-controls">
           <label className="memories-btn primary" htmlFor="memories-carousel-upload">Add Photos</label>
           <input id="memories-carousel-upload" type="file" accept="image/*" multiple onChange={handleUpload} />
+          <button
+            type="button"
+            className="memories-btn"
+            onClick={() => setIsPaused((current) => !current)}
+          >
+            {isPaused ? 'Play' : 'Pause'}
+          </button>
           <button type="button" className="memories-btn" onClick={clearAll}>Clear</button>
         </div>
       </header>
