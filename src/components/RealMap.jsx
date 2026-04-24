@@ -1,14 +1,11 @@
-import { Fragment, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   CircleMarker,
   MapContainer,
-  Marker,
   Polyline,
-  Popup,
   TileLayer,
   useMap,
 } from 'react-leaflet'
-import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
 const LOCATIONS = [
@@ -21,16 +18,6 @@ const LOCATIONS = [
 
 const ROUTE_COLORS = ['#38bdf8', '#34d399', '#f59e0b', '#fb7185']
 const ROUTE_POINTS = LOCATIONS.map((place) => place.coords)
-
-function createEmojiIcon(emoji) {
-  return L.divIcon({
-    className: 'leaflet-emoji-marker',
-    html: `<div style="font-size:22px;line-height:1">${emoji}</div>`,
-    iconSize: [24, 24],
-    iconAnchor: [12, 12],
-    popupAnchor: [0, -14],
-  })
-}
 
 function buildCurvePoints(from, to, bend = 0.36, samples = 28) {
   const [x1, y1] = from
@@ -236,11 +223,16 @@ function RealMap() {
         className="real-map-container"
         zoomAnimation
         scrollWheelZoom
+        dragging={false}
+        doubleClickZoom
+        touchZoom
+        boxZoom={false}
+        keyboard={false}
       >
         <FitRouteBounds />
         <TileLayer
-          attribution='&copy; OpenStreetMap contributors &copy; CARTO'
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+          attribution='&copy; OpenStreetMap contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
         {routeSegments.map((segment) => (
@@ -281,28 +273,17 @@ function RealMap() {
         />
 
         {LOCATIONS.map((place) => (
-          <Fragment key={place.name}>
-            <CircleMarker
-              center={place.coords}
-              radius={11}
-              pathOptions={{
-                color: place.color,
-                fillColor: place.color,
-                fillOpacity: 0.18,
-                weight: 2,
-              }}
-            />
-            <Marker position={place.coords} icon={createEmojiIcon(place.emoji)}>
-              <Popup>
-                <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 14 }}>
-                  <div style={{ fontWeight: 700, marginBottom: 4 }}>
-                    {place.emoji} {place.name}
-                  </div>
-                  <div style={{ color: '#94a3b8', fontSize: 12 }}>Route stop</div>
-                </div>
-              </Popup>
-            </Marker>
-          </Fragment>
+          <CircleMarker
+            key={place.name}
+            center={place.coords}
+            radius={11}
+            pathOptions={{
+              color: place.color,
+              fillColor: place.color,
+              fillOpacity: 0.18,
+              weight: 2,
+            }}
+          />
         ))}
       </MapContainer>
 

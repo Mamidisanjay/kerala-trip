@@ -24,6 +24,7 @@ function TripCarouselBuilder() {
     }
   })
   const [previewOpen, setPreviewOpen] = useState(false)
+  const [previewIndex, setPreviewIndex] = useState(0)
 
   useEffect(() => {
     window.localStorage.setItem(TRIP_CAROUSEL_STORAGE_KEY, JSON.stringify(images))
@@ -53,6 +54,7 @@ function TripCarouselBuilder() {
   const clearAll = () => {
     setImages([])
     setPreviewOpen(false)
+    setPreviewIndex(0)
   }
 
   return (
@@ -87,7 +89,16 @@ function TripCarouselBuilder() {
 
       <div className="trip-thumb-strip" aria-label="Trip thumbnails">
         {images.length ? images.map((image, idx) => (
-          <button key={image.id} type="button" className="trip-thumb-tile" onClick={() => setPreviewOpen(true)} aria-label={`Open carousel with photo ${idx + 1}`}>
+          <button
+            key={image.id}
+            type="button"
+            className="trip-thumb-tile"
+            onClick={() => {
+              setPreviewIndex(idx)
+              setPreviewOpen(true)
+            }}
+            aria-label={`Open carousel with photo ${idx + 1}`}
+          >
             <img src={image.src} alt={image.alt} />
           </button>
         )) : <div className="trip-thumb-empty">Add photos to generate your film-strip carousel</div>}
@@ -97,7 +108,13 @@ function TripCarouselBuilder() {
         <div className="gallery-preview">
           <button type="button" className="gallery-preview-backdrop" onClick={() => setPreviewOpen(false)} aria-label="Close preview" />
           <div className="gallery-preview-body">
-            <Carousel images={carouselImages} height={500} onClose={() => setPreviewOpen(false)} />
+            <Carousel
+              key={`preview-${previewIndex}-${carouselImages.length}`}
+              images={carouselImages}
+              initialIndex={previewIndex}
+              height={500}
+              onClose={() => setPreviewOpen(false)}
+            />
           </div>
         </div>
       )}

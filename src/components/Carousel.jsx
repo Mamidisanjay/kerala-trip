@@ -85,15 +85,16 @@ function Carousel({
     >
       <div className="premium-carousel-core" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
         <div className="premium-side-preview left" aria-hidden="true">
-          <img src={slides[prevIndex].src} alt={slides[prevIndex].alt} />
+          <img src={slides[prevIndex].src} alt={slides[prevIndex].alt} loading="lazy" />
         </div>
 
         <div className="premium-main-slide" key={slides[safeActive].src}>
-          <img src={slides[safeActive].src} alt={slides[safeActive].alt} />
+          <img className="premium-main-bg" src={slides[safeActive].src} alt="" aria-hidden="true" loading="lazy" />
+          <img className="premium-main-hero" src={slides[safeActive].src} alt={slides[safeActive].alt} loading="eager" />
         </div>
 
         <div className="premium-side-preview right" aria-hidden="true">
-          <img src={slides[nextIndex].src} alt={slides[nextIndex].alt} />
+          <img src={slides[nextIndex].src} alt={slides[nextIndex].alt} loading="lazy" />
         </div>
 
         {slides.length > 1 && (
