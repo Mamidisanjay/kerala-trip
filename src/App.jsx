@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
+import RealMap from './components/RealMap'
 import { PHOTO_FOLDER, SUPABASE_BUCKET, isSupabaseEnabled, supabase } from './lib/supabaseClient'
 import './App.css'
 
@@ -696,6 +697,16 @@ function App() {
     : cloudStatus === 'error'
       ? 'Cloud Issue'
       : 'Local Only'
+  const cloudStatus = syncMessage.includes('loading failed') || syncMessage.includes('Upload failed')
+    ? 'error'
+    : isSupabaseEnabled
+      ? 'cloud'
+      : 'local'
+  const cloudStatusLabel = cloudStatus === 'cloud'
+    ? 'Cloud Sync'
+    : cloudStatus === 'error'
+      ? 'Cloud Issue'
+      : 'Local Only'
 
   return (
     <div className={`app-root mood-${mood} ${phase === 'journey' ? 'journey-mode' : ''} ${phase === 'arrived' ? 'arrived-mode' : ''}`}>
@@ -1197,116 +1208,8 @@ function App() {
               The <span>Path</span> Through Paradise
             </h2>
           </div>
-          <div className="reveal glass-card" style={{ padding: 32 }}>
-            <svg viewBox="0 0 700 420" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', height: 'auto', display: 'block' }}>
-              <defs>
-                <radialGradient id="mapBg" cx="50%" cy="50%" r="60%">
-                  <stop offset="0%" stopColor="#0d2d1a" stopOpacity="0.6" />
-                  <stop offset="100%" stopColor="#061008" stopOpacity="0.9" />
-                </radialGradient>
-                <filter id="glow">
-                  <feGaussianBlur stdDeviation="3" result="coloredBlur" />
-                  <feMerge>
-                    <feMergeNode in="coloredBlur" />
-                    <feMergeNode in="SourceGraphic" />
-                  </feMerge>
-                </filter>
-              </defs>
-              <rect width="700" height="420" fill="url(#mapBg)" rx="16" />
-
-              <g opacity="0.05" stroke="white" strokeWidth="0.5">
-                <line x1="0" y1="140" x2="700" y2="140" />
-                <line x1="0" y1="280" x2="700" y2="280" />
-                <line x1="175" y1="0" x2="175" y2="420" />
-                <line x1="350" y1="0" x2="350" y2="420" />
-                <line x1="525" y1="0" x2="525" y2="420" />
-              </g>
-
-              <path
-                d="M 120,320 C 200,280 260,200 320,160 C 380,120 440,220 520,280 C 560,310 590,350 600,360"
-                fill="none"
-                stroke="rgba(212,168,83,0.25)"
-                strokeWidth="2.5"
-                strokeDasharray="8 5"
-              />
-              <path
-                d="M 120,320 C 200,280 260,200 320,160 C 380,120 440,220 520,280 C 560,310 590,350 600,360"
-                fill="none"
-                stroke="rgba(212,168,83,0.7)"
-                strokeWidth="1.5"
-                strokeDasharray="4 4"
-              >
-                <animate attributeName="stroke-dashoffset" from="0" to="-80" dur="3s" repeatCount="indefinite" />
-              </path>
-
-              <circle r="7" fill="#d4a853" filter="url(#glow)" opacity="0.9">
-                <animateMotion
-                  dur="8s"
-                  repeatCount="indefinite"
-                  path="M 120,320 C 200,280 260,200 320,160 C 380,120 440,220 520,280 C 560,310 590,350 600,360"
-                />
-              </circle>
-              <circle r="14" fill="rgba(212,168,83,0.2)" opacity="0.5">
-                <animateMotion
-                  dur="8s"
-                  repeatCount="indefinite"
-                  path="M 120,320 C 200,280 260,200 320,160 C 380,120 440,220 520,280 C 560,310 590,350 600,360"
-                />
-              </circle>
-
-              <circle cx="120" cy="320" r="8" fill="#1e40af" filter="url(#glow)" />
-              <circle cx="120" cy="320" r="16" fill="rgba(30,64,175,0.2)" />
-              <text x="90" y="348" fill="#93c5fd" fontSize="10" fontFamily="DM Sans,sans-serif" textAnchor="middle">
-                🏠 Home
-              </text>
-
-              <circle cx="200" cy="295" r="8" fill="#0d9488" filter="url(#glow)" />
-              <circle cx="200" cy="295" r="16" fill="rgba(13,148,136,0.2)" />
-              <text x="200" y="328" fill="#5eead4" fontSize="11" fontFamily="DM Sans,sans-serif" textAnchor="middle" fontWeight="600">
-                🌆 Kochi
-              </text>
-
-              <circle cx="330" cy="155" r="8" fill="#22c55e" filter="url(#glow)" />
-              <circle cx="330" cy="155" r="16" fill="rgba(34,197,94,0.2)" className="map-dot" />
-              <text x="360" y="142" fill="#86efac" fontSize="11" fontFamily="DM Sans,sans-serif" fontWeight="600">
-                ⛰️ Munnar
-              </text>
-
-              <circle cx="510" cy="285" r="8" fill="#0ea5e9" filter="url(#glow)" />
-              <circle cx="510" cy="285" r="16" fill="rgba(14,165,233,0.2)" />
-              <text x="510" y="320" fill="#7dd3fc" fontSize="11" fontFamily="DM Sans,sans-serif" textAnchor="middle" fontWeight="600">
-                🛶 Alleppey
-              </text>
-
-              <circle cx="598" cy="358" r="8" fill="#f59e0b" filter="url(#glow)" />
-              <circle cx="598" cy="358" r="16" fill="rgba(245,158,11,0.2)" />
-              <text x="598" y="390" fill="#fcd34d" fontSize="10" fontFamily="DM Sans,sans-serif" textAnchor="middle">
-                🏡 Return
-              </text>
-
-              <text x="350" y="40" fill="rgba(255,255,255,0.4)" fontSize="11" fontFamily="DM Sans,sans-serif" textAnchor="middle" letterSpacing="3">
-                KERALA · GOD'S OWN COUNTRY
-              </text>
-              <line x1="200" y1="50" x2="500" y2="50" stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
-
-              <g transform="translate(650,50)">
-                <circle r="18" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
-                <text x="0" y="-6" fill="rgba(255,255,255,0.5)" fontSize="8" textAnchor="middle">
-                  N
-                </text>
-                <text x="0" y="15" fill="rgba(255,255,255,0.3)" fontSize="7" textAnchor="middle">
-                  S
-                </text>
-                <text x="-12" y="5" fill="rgba(255,255,255,0.3)" fontSize="7" textAnchor="middle">
-                  W
-                </text>
-                <text x="13" y="5" fill="rgba(255,255,255,0.3)" fontSize="7" textAnchor="middle">
-                  E
-                </text>
-                <polygon points="0,-14 3,-2 0,0" fill="rgba(212,168,83,0.8)" />
-                <polygon points="0,14 -3,2 0,0" fill="rgba(255,255,255,0.3)" />
-              </g>
-            </svg>
+          <div className="reveal">
+            <RealMap />
           </div>
         </div>
       </section>
@@ -1354,10 +1257,13 @@ function App() {
                         onClick={() => openLightbox(idx)}
                         aria-label={`Open ${slot.label} photo`}
                       >
-                        <img src={photo.url} alt={photo.name} />
-                      </button>
+                        Add your own trip pictures here. You can upload up to 9 photos, and they will appear in the memory slots below.
                       <span className="memory-slot-label">{slot.label}</span>
                     </>
+                        <span className={`sync-indicator ${cloudStatus}`} title={syncMessage} aria-label={syncMessage}>
+                          <span className="sync-dot" />
+                          {cloudStatusLabel}
+                        </span>
                   ) : (
                     <>
                       <div style={{ fontSize: '2rem' }}>{slot.icon}</div>

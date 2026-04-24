@@ -95,6 +95,7 @@
   left: -180px;
   font-size: 2.5rem;
   animation: trainRide 18s linear infinite;
+  transform: scaleX(-1);
   filter: drop-shadow(0 0 12px rgba(255, 200, 50, 0.6));
   z-index: 4;
 }
@@ -1007,6 +1008,41 @@ nav {
   background: #f87171;
 }
 
+.real-map-wrap {
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 0 1px rgba(212, 168, 83, 0.15), 0 24px 60px rgba(0, 0, 0, 0.4), 0 0 28px rgba(13, 148, 136, 0.15);
+}
+
+.real-map-container {
+  width: 100%;
+  height: 460px;
+}
+
+.leaflet-container {
+  background: #08121d;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: rgba(11, 20, 32, 0.95);
+  color: #e2e8f0;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+}
+
+.leaflet-control-zoom a {
+  background: rgba(15, 23, 42, 0.92);
+  color: #e2e8f0;
+  border-color: rgba(148, 163, 184, 0.25);
+}
+
+.leaflet-control-attribution {
+  background: rgba(15, 23, 42, 0.62);
+  color: #94a3b8;
+}
+
 .lightbox {
   position: fixed;
   inset: 0;
@@ -1109,6 +1145,10 @@ nav {
 
   .hub-card {
     padding: 18px;
+  }
+
+  .real-map-container {
+    height: 340px;
   }
 
   .lightbox-content {
