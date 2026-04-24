@@ -1020,6 +1020,316 @@ nav {
   height: 460px;
 }
 
+.real-map-overlay {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  z-index: 410;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  background: rgba(2, 6, 23, 0.62);
+  backdrop-filter: blur(6px);
+  color: #dbeafe;
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.real-map-overlay.top {
+  top: 12px;
+}
+
+.real-map-overlay.bottom {
+  bottom: 12px;
+  justify-content: flex-start;
+}
+
+.real-map-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(15, 23, 42, 0.6);
+  color: #e2e8f0;
+  padding: 4px 10px;
+  font-size: 0.66rem;
+  text-transform: none;
+}
+
+.gallery-shell {
+  position: relative;
+}
+
+.gallery-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.gallery-title {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 1.15rem;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.03em;
+}
+
+.gallery-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.gallery-controls select,
+.gallery-controls input,
+.gallery-controls button {
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: rgba(15, 23, 42, 0.62);
+  color: #e2e8f0;
+  font-size: 0.76rem;
+  padding: 8px 12px;
+}
+
+.gallery-controls input {
+  max-width: 190px;
+}
+
+.gallery-controls button {
+  cursor: pointer;
+}
+
+.category-grid {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.category-chip {
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: rgba(2, 6, 23, 0.45);
+  color: #cbd5e1;
+  padding: 9px 11px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.category-chip.active {
+  border-color: rgba(212, 168, 83, 0.55);
+  background: rgba(212, 168, 83, 0.16);
+  color: #fef3c7;
+}
+
+.gallery-layout {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 16px;
+}
+
+.gallery-grid {
+  min-height: 220px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.gallery-image-tile {
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 14px;
+  overflow: hidden;
+  padding: 0;
+  height: 130px;
+  background: rgba(15, 23, 42, 0.52);
+  cursor: pointer;
+}
+
+.gallery-image-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gallery-empty {
+  grid-column: 1 / -1;
+  border: 1px dashed rgba(148, 163, 184, 0.34);
+  border-radius: 14px;
+  min-height: 160px;
+  display: grid;
+  place-items: center;
+  color: #94a3b8;
+  font-size: 0.84rem;
+}
+
+.gallery-carousel-panel {
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 16px;
+  padding: 10px;
+  background: rgba(2, 6, 23, 0.42);
+}
+
+.premium-carousel {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.premium-carousel-core {
+  position: relative;
+  flex: 1;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.26);
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.88), rgba(2, 6, 23, 0.95));
+  display: grid;
+  place-items: center;
+}
+
+.premium-main-slide {
+  position: relative;
+  width: 78%;
+  height: 88%;
+  border-radius: 14px;
+  overflow: hidden;
+  z-index: 3;
+  border: 1px solid rgba(212, 168, 83, 0.35);
+}
+
+.premium-main-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.premium-side-preview {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%) scale(0.85);
+  width: 28%;
+  height: 64%;
+  border-radius: 12px;
+  overflow: hidden;
+  opacity: 0.4;
+  filter: blur(0.3px) saturate(0.8);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+}
+
+.premium-side-preview.left {
+  left: 2%;
+}
+
+.premium-side-preview.right {
+  right: 2%;
+}
+
+.premium-side-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.premium-arrow,
+.premium-close {
+  position: absolute;
+  z-index: 5;
+  border-radius: 50%;
+  border: 1px solid rgba(148, 163, 184, 0.36);
+  background: rgba(15, 23, 42, 0.72);
+  color: #f8fafc;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+}
+
+.premium-arrow.left {
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.premium-arrow.right {
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.premium-close {
+  top: 10px;
+  right: 10px;
+}
+
+.premium-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.premium-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: rgba(51, 65, 85, 0.7);
+  cursor: pointer;
+}
+
+.premium-dot.active {
+  background: #d4a853;
+  border-color: #d4a853;
+}
+
+.premium-carousel.empty {
+  border-radius: 14px;
+  border: 1px dashed rgba(148, 163, 184, 0.38);
+  display: grid;
+  place-items: center;
+}
+
+.premium-empty-text {
+  color: #94a3b8;
+  font-size: 0.84rem;
+}
+
+.gallery-preview {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  display: grid;
+  place-items: center;
+}
+
+.gallery-preview-backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: rgba(2, 6, 23, 0.86);
+}
+
+.gallery-preview-body {
+  position: relative;
+  width: min(94vw, 940px);
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(2, 6, 23, 0.8);
+  padding: 12px;
+}
+
 .leaflet-container {
   background: #08121d;
   font-family: 'DM Sans', sans-serif;
@@ -1141,6 +1451,36 @@ nav {
 
   .train {
     font-size: 1.8rem;
+  }
+
+  .real-map-container {
+    height: 420px;
+  }
+
+  .real-map-overlay.bottom {
+    display: none;
+  }
+
+  .gallery-controls {
+    width: 100%;
+  }
+
+  .gallery-controls select,
+  .gallery-controls input,
+  .gallery-controls button {
+    flex: 1 1 100%;
+  }
+
+  .category-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gallery-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .gallery-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .hub-card {

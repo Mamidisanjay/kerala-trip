@@ -16,6 +16,7 @@ const LOCATIONS = [
   { name: 'Kochi', emoji: '🌆', coords: [9.9312, 76.2673], color: '#2dd4bf' },
   { name: 'Munnar', emoji: '⛰️', coords: [10.0889, 77.0595], color: '#4ade80' },
   { name: 'Alleppey', emoji: '🛶', coords: [9.4981, 76.3388], color: '#f59e0b' },
+  { name: 'Return Vijayawada', emoji: '🏡', coords: [16.5193, 80.6305], color: '#f87171' },
 ]
 
 const ROUTE_POINTS = LOCATIONS.map((place) => place.coords)
@@ -43,6 +44,19 @@ function toSegmentLengths(points) {
   }
 
   return { lengths, total }
+}
+
+function haversineKm(from, to) {
+  const [lat1, lon1] = from
+  const [lat2, lon2] = to
+  const toRad = (value) => (value * Math.PI) / 180
+  const dLat = toRad(lat2 - lat1)
+  const dLon = toRad(lon2 - lon1)
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+  return 6371 * c
 }
 
 function getPointAtProgress(points, lengths, totalLength, progress) {
@@ -101,7 +115,7 @@ function FitRouteBounds() {
 
   useEffect(() => {
     map.fitBounds(ROUTE_POINTS, {
-      padding: [32, 32],
+      padding: [42, 42],
       animate: true,
       duration: 1.2,
     })
@@ -116,9 +130,17 @@ function RealMap() {
 
   const { lengths, total } = useMemo(() => toSegmentLengths(ROUTE_POINTS), [])
 
+  const totalKm = useMemo(() => {
+    let sum = 0
+    for (let idx = 0; idx < ROUTE_POINTS.length - 1; idx += 1) {
+      sum += haversineKm(ROUTE_POINTS[idx], ROUTE_POINTS[idx + 1])
+    }
+    return Math.round(sum)
+  }, [])
+
   useEffect(() => {
     let frame = null
-    const duration = 2400
+    const duration = 2600
     const start = performance.now()
 
     const animate = (time) => {
@@ -135,7 +157,7 @@ function RealMap() {
 
   useEffect(() => {
     let frame = null
-    const duration = 9000
+    const duration = 11000
     const start = performance.now()
 
     const animate = (time) => {
@@ -162,6 +184,11 @@ function RealMap() {
 
   return (
     <div className="real-map-wrap">
+      <div className="real-map-overlay top">
+        <span>🚆 Premium Route View</span>
+        <span>{LOCATIONS.length} stops · {totalKm} km</span>
+      </div>
+
       <MapContainer
         center={ROUTE_POINTS[0]}
         zoom={7}
@@ -178,14 +205,25 @@ function RealMap() {
         />
 
         <Polyline
+          positions={ROUTE_POINTS}
+          pathOptions={{
+            color: '#334155',
+            weight: 6,
+            opacity: 0.55,
+            lineCap: 'round',
+            lineJoin: 'round',
+          }}
+        />
+
+        <Polyline
           positions={partialRoute}
           pathOptions={{
             color: '#d4a853',
             weight: 4,
-            opacity: 0.9,
+            opacity: 0.95,
             lineCap: 'round',
             lineJoin: 'round',
-            dashArray: '6 10',
+            dashArray: '10 8',
           }}
         />
 
@@ -218,13 +256,21 @@ function RealMap() {
                   <div style={{ fontWeight: 700, marginBottom: 4 }}>
                     {place.emoji} {place.name}
                   </div>
-                  <div style={{ color: '#334155', fontSize: 12 }}>Route stop</div>
+                  <div style={{ color: '#94a3b8', fontSize: 12 }}>Route stop</div>
                 </div>
               </Popup>
             </Marker>
           </Fragment>
         ))}
       </MapContainer>
+
+      <div className="real-map-overlay bottom">
+        {LOCATIONS.map((place) => (
+          <span key={`chip-${place.name}`} className="real-map-chip">
+            {place.emoji} {place.name}
+          </span>
+        ))}
+      </div>
     </div>
   )
 }

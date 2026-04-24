@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
+import Gallery from './components/Gallery'
 import RealMap from './components/RealMap'
 import { PHOTO_FOLDER, SUPABASE_BUCKET, isSupabaseEnabled, supabase } from './lib/supabaseClient'
 import './App.css'
@@ -1260,6 +1261,10 @@ function App() {
                 </div>
               )
             })}
+          </div>
+
+          <div className="reveal" style={{ marginTop: 28 }}>
+            <Gallery />
           </div>
         </div>
       </section>
