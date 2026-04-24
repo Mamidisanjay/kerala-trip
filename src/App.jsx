@@ -697,16 +697,6 @@ function App() {
     : cloudStatus === 'error'
       ? 'Cloud Issue'
       : 'Local Only'
-  const cloudStatus = syncMessage.includes('loading failed') || syncMessage.includes('Upload failed')
-    ? 'error'
-    : isSupabaseEnabled
-      ? 'cloud'
-      : 'local'
-  const cloudStatusLabel = cloudStatus === 'cloud'
-    ? 'Cloud Sync'
-    : cloudStatus === 'error'
-      ? 'Cloud Issue'
-      : 'Local Only'
 
   return (
     <div className={`app-root mood-${mood} ${phase === 'journey' ? 'journey-mode' : ''} ${phase === 'arrived' ? 'arrived-mode' : ''}`}>
@@ -1257,13 +1247,10 @@ function App() {
                         onClick={() => openLightbox(idx)}
                         aria-label={`Open ${slot.label} photo`}
                       >
-                        Add your own trip pictures here. You can upload up to 9 photos, and they will appear in the memory slots below.
+                        <img src={photo.url} alt={photo.name} />
+                      </button>
                       <span className="memory-slot-label">{slot.label}</span>
                     </>
-                        <span className={`sync-indicator ${cloudStatus}`} title={syncMessage} aria-label={syncMessage}>
-                          <span className="sync-dot" />
-                          {cloudStatusLabel}
-                        </span>
                   ) : (
                     <>
                       <div style={{ fontSize: '2rem' }}>{slot.icon}</div>
