@@ -2162,3 +2162,172 @@ nav {
     text-align: center;
   }
 }
+
+/* Override: map and ring carousel refresh */
+.journey-map-fullbleed {
+  background: transparent;
+}
+
+.journey-map-stack {
+  position: relative;
+  width: 100%;
+  height: calc(100% - 36px);
+}
+
+.journey-map-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+}
+
+.journey-map-svg.overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.memories-carousel-full.ring-cinematic {
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(26, 42, 74, 0.65) 0%, rgba(10, 15, 30, 0.5) 58%),
+    radial-gradient(ellipse at 15% 85%, rgba(13, 79, 60, 0.3) 0%, transparent 52%);
+}
+
+.ring-ambient {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(34px);
+  opacity: 0.28;
+  animation: orbDrift 14s ease-in-out infinite;
+}
+
+.orb-a {
+  width: 200px;
+  height: 200px;
+  left: 10%;
+  top: 24%;
+  background: rgba(13, 148, 136, 0.6);
+}
+
+.orb-b {
+  width: 220px;
+  height: 220px;
+  right: 12%;
+  top: 16%;
+  background: rgba(212, 168, 83, 0.6);
+  animation-delay: -4s;
+}
+
+.orb-c {
+  width: 180px;
+  height: 180px;
+  left: 45%;
+  bottom: 10%;
+  background: rgba(148, 163, 184, 0.45);
+  animation-delay: -8s;
+}
+
+.ring-desktop {
+  height: calc(100% - 88px);
+}
+
+.ring-stage {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: grid;
+  place-items: center;
+  perspective: 2000px;
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.ring-stage:active {
+  cursor: grabbing;
+}
+
+.ring-core {
+  position: relative;
+  width: 1px;
+  height: 1px;
+  transform-style: preserve-3d;
+}
+
+.ring-card {
+  position: absolute;
+  left: calc(var(--ring-card-width) / -2);
+  top: calc(var(--ring-card-height) / -2);
+  width: var(--ring-card-width);
+  height: var(--ring-card-height);
+  transform-style: preserve-3d;
+  border-radius: 22px;
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  overflow: hidden;
+  backface-visibility: hidden;
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.35);
+}
+
+.ring-card-media {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.55);
+}
+
+.ring-card-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(24px) saturate(1.08);
+  transform: scale(1.08);
+  opacity: 0.58;
+}
+
+.ring-card-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+.ring-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.14), transparent 35%, transparent 68%, rgba(255, 255, 255, 0.08));
+  mix-blend-mode: soft-light;
+}
+
+@keyframes orbDrift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(16px, -12px, 0) scale(1.07);
+  }
+}
+
+@media (max-width: 640px) {
+  .ring-desktop {
+    display: none;
+  }
+
+  .ring-mobile {
+    display: block;
+  }
+}

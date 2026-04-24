@@ -1,12 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 
-const STORAGE_KEY = 'kerala-memories-carousel-v2'
-const DESKTOP_OFFSETS = [-2, -1, 0, 1, 2]
-
-function wrapIndex(index, total) {
-  if (!total) return 0
-  return ((index % total) + total) % total
-}
+const STORAGE_KEY = 'kerala-memories-carousel-v3'
 
 function readFileAsDataUrl(file) {
   return new Promise((resolve, reject) => {
@@ -17,103 +11,103 @@ function readFileAsDataUrl(file) {
   })
 }
 
-function cardStyle(offset) {
-  if (offset === 0) {
-    return {
-      transform: 'translate(-50%, -50%) translateX(0px) translateY(-8px) scale(1) rotateY(0deg)',
-      opacity: 1,
-      zIndex: 8,
-    }
-  }
-
-  if (offset === -1) {
-    return {
-      transform: 'translate(-50%, -50%) translateX(-300px) translateY(68px) scale(0.82) rotateY(22deg)',
-      opacity: 0.8,
-      zIndex: 6,
-    }
-  }
-
-  if (offset === 1) {
-    return {
-      transform: 'translate(-50%, -50%) translateX(300px) translateY(68px) scale(0.82) rotateY(-22deg)',
-      opacity: 0.8,
-      zIndex: 6,
-    }
-  }
-
-  if (offset === -2) {
-    return {
-      transform: 'translate(-50%, -50%) translateX(-520px) translateY(138px) scale(0.6) rotateY(30deg)',
-      opacity: 0.34,
-      zIndex: 4,
-    }
-  }
-
-  return {
-    transform: 'translate(-50%, -50%) translateX(520px) translateY(138px) scale(0.6) rotateY(-30deg)',
-    opacity: 0.34,
-    zIndex: 4,
-  }
-}
-
 function CarouselSection() {
   const [items, setItems] = useState(() => {
     if (typeof window === 'undefined') return []
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY)
       const parsed = raw ? JSON.parse(raw) : []
-      return Array.isArray(parsed) ? parsed.filter((it) => it?.image) : []
+      return Array.isArray(parsed) ? parsed.filter((item) => item?.image) : []
     } catch {
       return []
     }
   })
-  const [active, setActive] = useState(0)
-  const touchStartX = useRef(null)
+  const [stageWidth, setStageWidth] = useState(1000)
+
+  const stageRef = useRef(null)
+  const ringRef = useRef(null)
+
+  const rotationRef = useRef(180)
+  const velocityRef = useRef(0)
+  const draggingRef = useRef(false)
+  const pointerXRef = useRef(0)
+
+  const slides = useMemo(() => items.filter((item) => item?.image), [items])
+  const stepDeg = slides.length ? 360 / slides.length : 0
 
   useEffect(() => {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
   }, [items])
 
-  const slides = useMemo(() => items.filter((item) => item?.image), [items])
+  useEffect(() => {
+    const node = stageRef.current
+    if (!node || typeof ResizeObserver === 'undefined') return undefined
 
-  const goNext = () => {
-    if (!slides.length) return
-    setActive((index) => wrapIndex(index + 1, slides.length))
-  }
+    const observer = new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect?.width
+      if (width) setStageWidth(width)
+    })
 
-  const goPrev = () => {
-    if (!slides.length) return
-    setActive((index) => wrapIndex(index - 1, slides.length))
-  }
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
-    if (slides.length < 2) return undefined
-    const timer = window.setInterval(() => {
-      setActive((index) => wrapIndex(index + 1, slides.length))
-    }, 3600)
+    let frame = null
+    let prev = performance.now()
 
-    return () => window.clearInterval(timer)
-  }, [slides.length])
+    const tick = (now) => {
+      const dt = Math.min(2.2, (now - prev) / 16.666)
+      prev = now
 
-  const onTouchStart = (event) => {
-    touchStartX.current = event.changedTouches[0]?.clientX ?? null
-  }
+      if (!draggingRef.current) {
+        rotationRef.current += (0.24 + velocityRef.current) * dt
+        velocityRef.current *= 0.94
+        if (Math.abs(velocityRef.current) < 0.0008) velocityRef.current = 0
+      }
 
-  const onTouchEnd = (event) => {
-    const start = touchStartX.current
-    if (start === null) return
+      if (ringRef.current) {
+        ringRef.current.style.transform = `rotateX(14deg) rotateY(${rotationRef.current}deg)`
+      }
 
-    const end = event.changedTouches[0]?.clientX
-    if (typeof end !== 'number') return
-
-    const delta = end - start
-    if (Math.abs(delta) > 35) {
-      if (delta < 0) goNext()
-      if (delta > 0) goPrev()
+      frame = requestAnimationFrame(tick)
     }
 
-    touchStartX.current = null
+    frame = requestAnimationFrame(tick)
+    return () => {
+      if (frame) cancelAnimationFrame(frame)
+    }
+  }, [])
+
+  const onPointerDown = (event) => {
+    draggingRef.current = true
+    pointerXRef.current = event.clientX
+    if (stageRef.current) stageRef.current.setPointerCapture(event.pointerId)
+  }
+
+  const onPointerMove = (event) => {
+    if (!draggingRef.current) return
+
+    const delta = event.clientX - pointerXRef.current
+    pointerXRef.current = event.clientX
+
+    rotationRef.current += delta * 0.36
+    velocityRef.current = delta * 0.011
+
+    if (ringRef.current) {
+      ringRef.current.style.transform = `rotateX(14deg) rotateY(${rotationRef.current}deg)`
+    }
+  }
+
+  const onPointerUp = (event) => {
+    draggingRef.current = false
+    if (stageRef.current) stageRef.current.releasePointerCapture(event.pointerId)
+  }
+
+  const rotateByStep = (direction) => {
+    if (!slides.length) return
+    rotationRef.current += direction * stepDeg
+    velocityRef.current += direction * 0.03
   }
 
   const handleUpload = async (event) => {
@@ -133,17 +127,27 @@ function CarouselSection() {
 
   const clearAll = () => {
     setItems([])
-    setActive(0)
+    rotationRef.current = 180
+    velocityRef.current = 0
   }
 
+  const ringRadius = Math.max(220, Math.min(620, stageWidth * 0.42))
+  const cardWidth = Math.max(180, Math.min(360, stageWidth * 0.26))
+  const cardHeight = Math.round(cardWidth * 0.56)
+
   return (
-    <section className="memories-carousel-full cinematic" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+    <section className="memories-carousel-full ring-cinematic">
       <div className="memories-carousel-bg" aria-hidden="true">
         <span>MEMORIES</span>
       </div>
+      <div className="ring-ambient" aria-hidden="true">
+        <i className="orb orb-a" />
+        <i className="orb orb-b" />
+        <i className="orb orb-c" />
+      </div>
 
       <header className="memories-carousel-head">
-        <div className="badge">🎠 Memory Reel</div>
+        <div className="badge">🎠 Infinite Memory Ring</div>
         <div className="memories-carousel-controls">
           <label className="memories-btn primary" htmlFor="memories-carousel-upload">Add Photos</label>
           <input id="memories-carousel-upload" type="file" accept="image/*" multiple onChange={handleUpload} />
@@ -151,39 +155,55 @@ function CarouselSection() {
         </div>
       </header>
 
-      <div className="memories-carousel-desktop">
+      <div className="memories-carousel-desktop ring-desktop">
         {slides.length > 0 ? (
           <>
-            <button type="button" className="memories-arrow left" onClick={goPrev} aria-label="Previous image">‹</button>
-            <div className="memories-stage">
-              {DESKTOP_OFFSETS.map((offset) => {
-                const index = wrapIndex(active + offset, slides.length)
-                const item = slides[index]
-                return (
-                  <article key={`${item.id}-${offset}`} className="memories-card" style={cardStyle(offset)}>
-                    <div className="memories-card-media">
-                      <img src={item.image} alt="" className="memories-card-bg" aria-hidden="true" loading="lazy" />
-                      <img src={item.image} alt="Trip memory" className="memories-card-image" loading="lazy" />
+            <button type="button" className="memories-arrow left" onClick={() => rotateByStep(-1)} aria-label="Rotate left">‹</button>
+
+            <div
+              ref={stageRef}
+              className="ring-stage"
+              onPointerDown={onPointerDown}
+              onPointerMove={onPointerMove}
+              onPointerUp={onPointerUp}
+              onPointerCancel={onPointerUp}
+              style={{
+                '--ring-radius': `${ringRadius}px`,
+                '--ring-card-width': `${cardWidth}px`,
+                '--ring-card-height': `${cardHeight}px`,
+              }}
+            >
+              <div ref={ringRef} className="ring-core">
+                {slides.map((item, index) => (
+                  <article
+                    key={item.id}
+                    className="ring-card"
+                    style={{ transform: `rotateY(${index * stepDeg}deg) translateZ(var(--ring-radius))` }}
+                  >
+                    <div className="ring-card-media">
+                      <img src={item.image} alt="" className="ring-card-bg" aria-hidden="true" loading="lazy" />
+                      <img src={item.image} alt="Trip memory" className="ring-card-image" loading="lazy" />
                     </div>
                   </article>
-                )
-              })}
+                ))}
+              </div>
             </div>
-            <button type="button" className="memories-arrow right" onClick={goNext} aria-label="Next image">›</button>
+
+            <button type="button" className="memories-arrow right" onClick={() => rotateByStep(1)} aria-label="Rotate right">›</button>
           </>
         ) : (
-          <div className="memories-empty">Upload photos to generate your full-screen memory carousel.</div>
+          <div className="memories-empty">Upload any number of photos to spin your infinite cinematic ring.</div>
         )}
       </div>
 
-      <div className="memories-carousel-mobile">
+      <div className="memories-carousel-mobile ring-mobile">
         {slides.length > 0 ? (
           <div className="memories-mobile-track">
             {slides.map((item) => (
               <article key={item.id} className="memories-mobile-card">
-                <div className="memories-card-media">
-                  <img src={item.image} alt="" className="memories-card-bg" aria-hidden="true" loading="lazy" />
-                  <img src={item.image} alt="Trip memory" className="memories-card-image" loading="lazy" />
+                <div className="ring-card-media">
+                  <img src={item.image} alt="" className="ring-card-bg" aria-hidden="true" loading="lazy" />
+                  <img src={item.image} alt="Trip memory" className="ring-card-image" loading="lazy" />
                 </div>
               </article>
             ))}
