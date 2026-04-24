@@ -82,7 +82,7 @@ function TripCarouselBuilder() {
           if (images.length) setPreviewOpen(true)
         }
       }}>
-        <Carousel images={carouselImages} height={420} />
+        <Carousel images={carouselImages} height={420} autoplay intervalMs={2600} />
       </div>
 
       <div className="trip-thumb-strip" aria-label="Trip thumbnails">

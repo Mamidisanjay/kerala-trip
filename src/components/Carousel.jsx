@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 function normalizeImages(images) {
   return (images || []).map((item) => {
@@ -12,9 +12,18 @@ function normalizeImages(images) {
   }).filter((item) => item.src)
 }
 
-function Carousel({ images, initialIndex = 0, height = 360, onClose }) {
+function Carousel({
+  images,
+  initialIndex = 0,
+  height = 360,
+  onClose,
+  autoplay = false,
+  intervalMs = 2800,
+  pauseOnHover = true,
+}) {
   const slides = useMemo(() => normalizeImages(images), [images])
   const [active, setActive] = useState(Math.max(0, initialIndex || 0))
+  const [isPaused, setIsPaused] = useState(false)
   const touchStartX = useRef(null)
 
   const safeActive = slides.length ? Math.max(0, Math.min(slides.length - 1, active)) : 0
@@ -32,6 +41,7 @@ function Carousel({ images, initialIndex = 0, height = 360, onClose }) {
   }
 
   const onTouchStart = (event) => {
+    setIsPaused(true)
     touchStartX.current = event.changedTouches[0]?.clientX ?? null
   }
 
@@ -47,6 +57,17 @@ function Carousel({ images, initialIndex = 0, height = 360, onClose }) {
     touchStartX.current = null
   }
 
+  useEffect(() => {
+    if (!autoplay || slides.length < 2 || isPaused) return undefined
+    const timer = window.setInterval(() => {
+      setActive((idx) => (idx + 1) % slides.length)
+    }, intervalMs)
+
+    return () => {
+      window.clearInterval(timer)
+    }
+  }, [autoplay, intervalMs, isPaused, slides.length])
+
   if (!slides.length) {
     return (
       <div className="premium-carousel empty" style={{ height }}>
@@ -56,7 +77,12 @@ function Carousel({ images, initialIndex = 0, height = 360, onClose }) {
   }
 
   return (
-    <div className="premium-carousel" style={{ height }}>
+    <div
+      className={`premium-carousel ${autoplay ? 'autoplay' : ''}`}
+      style={{ height }}
+      onMouseEnter={() => pauseOnHover && setIsPaused(true)}
+      onMouseLeave={() => pauseOnHover && setIsPaused(false)}
+    >
       <div className="premium-carousel-core" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
         <div className="premium-side-preview left" aria-hidden="true">
           <img src={slides[prevIndex].src} alt={slides[prevIndex].alt} />
