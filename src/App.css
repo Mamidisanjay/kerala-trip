@@ -2333,6 +2333,326 @@ nav {
   }
 }
 
+.journey-iso-card {
+  max-width: 980px;
+  margin: 0 auto;
+  border-radius: 24px;
+  padding: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+}
+
+.journey-iso-top {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 14px;
+}
+
+.journey-iso-copy {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 0.86rem;
+}
+
+.journey-iso-scene {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  min-height: 360px;
+  border-radius: 20px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 22%, rgba(34, 197, 94, 0.15), transparent 34%),
+    radial-gradient(circle at 80% 70%, rgba(59, 130, 246, 0.15), transparent 32%),
+    linear-gradient(180deg, rgba(5, 15, 30, 0.92), rgba(10, 15, 30, 0.98));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.journey-iso-bgtext {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 8vw, 7rem);
+  letter-spacing: 0.3em;
+  color: rgba(255, 255, 255, 0.045);
+  pointer-events: none;
+}
+
+.journey-iso-world {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(60deg) rotateZ(45deg) scale(1.18) translateY(-5%);
+  transform-origin: center;
+}
+
+.terrain-layer {
+  position: absolute;
+  transform-style: preserve-3d;
+  border-radius: 18px;
+}
+
+.terrain-base {
+  inset: 12% 10% 14%;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.92) 0%, rgba(120, 113, 108, 0.9) 52%, rgba(59, 130, 246, 0.84) 100%);
+  box-shadow: 0 28px 58px rgba(0, 0, 0, 0.34);
+}
+
+.terrain-shadow {
+  inset: 12% 10% 14%;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.14), transparent 40%, rgba(0, 0, 0, 0.16));
+  filter: blur(8px);
+  transform: translateZ(2px);
+}
+
+.terrain-city,
+.terrain-water,
+.terrain-hills,
+.terrain-green {
+  transform: translateZ(12px);
+  box-shadow: 0 18px 32px rgba(0, 0, 0, 0.28);
+}
+
+.vijayawada-city {
+  left: 14%;
+  top: 20%;
+  width: 16%;
+  height: 16%;
+  background: linear-gradient(180deg, rgba(148, 163, 184, 0.88), rgba(71, 85, 105, 0.9));
+  clip-path: polygon(10% 18%, 78% 8%, 92% 76%, 28% 92%, 6% 56%);
+}
+
+.vijayawada-city::before,
+.vijayawada-city::after {
+  content: '';
+  position: absolute;
+  inset: 14% 18%;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+}
+
+.vijayawada-city::after {
+  inset: 48% 12% 10% 54%;
+}
+
+.kochi-water {
+  left: 38%;
+  top: 32%;
+  width: 18%;
+  height: 15%;
+  background: linear-gradient(135deg, rgba(125, 211, 252, 0.95), rgba(14, 165, 233, 0.9));
+  clip-path: polygon(0 16%, 100% 0, 88% 100%, 10% 88%);
+  transform: translateZ(15px);
+}
+
+.alleppey-water {
+  left: 67%;
+  top: 54%;
+  width: 17%;
+  height: 17%;
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.95), rgba(14, 165, 233, 0.9));
+  clip-path: polygon(12% 8%, 88% 0, 100% 72%, 76% 100%, 8% 94%, 0 32%);
+  transform: translateZ(14px);
+}
+
+.munnar-hills {
+  left: 48%;
+  top: 15%;
+  width: 18%;
+  height: 16%;
+  background: linear-gradient(180deg, rgba(74, 222, 128, 0.98), rgba(34, 197, 94, 0.92));
+  clip-path: polygon(10% 90%, 28% 40%, 44% 14%, 58% 30%, 74% 0, 94% 24%, 100% 56%, 78% 68%, 60% 100%, 28% 100%);
+  transform: translateZ(18px);
+}
+
+.terrain-green.ridge-a {
+  left: 44%;
+  top: 20%;
+  width: 14%;
+  height: 10%;
+  background: rgba(34, 197, 94, 0.65);
+  clip-path: polygon(0 78%, 18% 28%, 42% 0, 56% 22%, 74% 10%, 100% 58%, 76% 100%, 18% 100%);
+  transform: translateZ(22px);
+}
+
+.terrain-green.ridge-b {
+  left: 58%;
+  top: 24%;
+  width: 12%;
+  height: 8%;
+  background: rgba(22, 163, 74, 0.48);
+  clip-path: polygon(0 68%, 18% 18%, 46% 0, 66% 24%, 100% 56%, 70% 100%, 18% 92%);
+  transform: translateZ(20px);
+}
+
+.journey-iso-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.iso-path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.train-path-base {
+  stroke: rgba(255, 255, 255, 0.12);
+  stroke-width: 2.5;
+}
+
+.train-path-forward {
+  stroke: url(#trainGlow);
+  stroke-width: 3.2;
+  filter: drop-shadow(0 0 8px rgba(94, 234, 212, 0.5));
+}
+
+.road-path-base {
+  stroke: rgba(255, 255, 255, 0.12);
+  stroke-width: 2.2;
+}
+
+.road-path-highlight {
+  stroke: url(#roadGlow);
+  stroke-width: 2.8;
+  stroke-dasharray: 4 5;
+  filter: drop-shadow(0 0 7px rgba(96, 165, 250, 0.45));
+}
+
+.return-path {
+  stroke: rgba(212, 168, 83, 0.82);
+  stroke-width: 1.8;
+  stroke-dasharray: 3 4;
+  filter: drop-shadow(0 0 6px rgba(212, 168, 83, 0.34));
+}
+
+.boat-path {
+  stroke: url(#waterGlow);
+  stroke-width: 2;
+  stroke-dasharray: 2 5;
+  opacity: 0.7;
+}
+
+.iso-marker {
+  fill: #94a3b8;
+  stroke: rgba(10, 15, 30, 0.85);
+  stroke-width: 0.4;
+}
+
+.iso-marker.active {
+  fill: #fbbf24;
+}
+
+.iso-label {
+  fill: rgba(226, 232, 240, 0.85);
+  font-size: 3.2px;
+  letter-spacing: 0.03em;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.iso-label.active {
+  fill: #ffffff;
+  font-weight: 700;
+}
+
+.iso-mover {
+  font-size: 4.2px;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.18));
+}
+
+.iso-icon {
+  font-size: 4.2px;
+}
+
+.journey-iso-legend {
+  margin-top: 12px;
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  font-size: 0.72rem;
+  color: #cbd5e1;
+}
+
+.journey-iso-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.legend-stroke {
+  width: 18px;
+  height: 2px;
+  border-radius: 99px;
+  display: inline-block;
+}
+
+.legend-stroke.train {
+  background: linear-gradient(90deg, #5eead4, #d4a853);
+}
+
+.legend-stroke.road {
+  background: linear-gradient(90deg, #60a5fa, #34d399);
+}
+
+.legend-stroke.return {
+  background: repeating-linear-gradient(90deg, rgba(212, 168, 83, 0.9), rgba(212, 168, 83, 0.9) 5px, transparent 5px, transparent 8px);
+}
+
+@media (max-width: 640px) {
+  .journey-iso-card {
+    padding: 14px;
+    border-radius: 20px;
+  }
+
+  .journey-iso-scene {
+    aspect-ratio: 4 / 5;
+    min-height: 300px;
+  }
+
+  .journey-iso-world {
+    transform: rotateX(60deg) rotateZ(45deg) scale(1.02) translateY(0);
+  }
+
+  .terrain-base {
+    inset: 11% 8% 15%;
+  }
+
+  .journey-iso-copy {
+    font-size: 0.8rem;
+  }
+
+  .iso-label {
+    font-size: 2.8px;
+  }
+
+  .iso-mover,
+  .iso-icon {
+    font-size: 3.6px;
+  }
+
+  .journey-iso-legend {
+    font-size: 0.68rem;
+    gap: 10px;
+  }
+
+  .memories-carousel-full.ring-cinematic {
+    min-height: 560px;
+  }
+
+  .memories-carousel-mobile.ring-mobile {
+    display: block;
+  }
+
+  .memories-mobile-track {
+    grid-auto-columns: 88%;
+  }
+}
+
 .journey-map-card {
   max-width: 920px;
   margin: 0 auto;

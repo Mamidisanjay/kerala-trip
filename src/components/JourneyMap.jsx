@@ -1,93 +1,141 @@
-const INDIA_MAP_IMAGE = 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/India_location_map.svg/1280px-India_location_map.svg.png'
+import { useMemo } from 'react'
 
-const LOCATIONS = {
-  vijayawada: { x: 67.5, y: 50.5, label: 'Vijayawada' },
-  kochi: { x: 49.2, y: 80.2, label: 'Kochi' },
-  munnar: { x: 50.8, y: 74.8, label: 'Munnar' },
-  alleppey: { x: 49.1, y: 84.1, label: 'Alleppey' },
+const LOCATIONS = [
+  { id: 'vijayawada', x: 18, y: 28, label: 'Vijayawada' },
+  { id: 'kochi', x: 42, y: 43, label: 'Kochi' },
+  { id: 'munnar', x: 58, y: 26, label: 'Munnar' },
+  { id: 'alleppey', x: 74, y: 52, label: 'Alleppey' },
+]
+
+const TRAIN_PATH = 'M18 28 C26 29, 33 35, 42 43'
+const ROAD_PATH = 'M42 43 C49 38, 52 31, 58 26 C64 24, 69 38, 74 52 C67 48, 56 45, 42 43'
+const RETURN_PATH = 'M42 43 C32 37, 24 32, 18 28'
+const BOAT_PATH = 'M72 52 C77 48, 79 56, 74 60 C69 64, 66 56, 72 52'
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value))
 }
 
-const FORWARD_PATH = 'M67.5 50.5 C60 58, 53 70, 49.2 80.2 C49.8 78.5, 50.3 76.8, 50.8 74.8 C50.2 77.6, 49.6 80.8, 49.1 84.1'
-const RETURN_PATH = 'M49.2 80.2 C55 68, 60.8 59, 67.5 50.5'
-
 function getActiveStop(progress) {
-  if (progress < 20) return 'vijayawada'
+  if (progress < 22) return 'vijayawada'
   if (progress < 48) return 'kochi'
-  if (progress < 75) return 'munnar'
+  if (progress < 72) return 'munnar'
   return 'alleppey'
 }
 
-function labelProps(id, x, y) {
-  if (id === 'vijayawada') return { x: x + 2.3, y: y - 2.3, anchor: 'start' }
-  if (id === 'kochi') return { x: x - 2, y: y + 4.5, anchor: 'end' }
-  if (id === 'munnar') return { x: x + 2.2, y: y - 3, anchor: 'start' }
-  return { x: x + 2.2, y: y + 4.2, anchor: 'start' }
-}
-
 function JourneyMap({ progress = 0 }) {
-  const safeProgress = Math.max(0, Math.min(100, Number(progress) || 0))
-  const activeStop = getActiveStop(safeProgress)
+  const safeProgress = clamp(Number(progress) || 0, 0, 100)
+  const activeStop = useMemo(() => getActiveStop(safeProgress), [safeProgress])
+
+  const trainDash = `${clamp(safeProgress * 0.6, 0, 100)} 100`
+  const roadDash = `${clamp((safeProgress - 20) * 0.9, 0, 100)} 100`
+  const returnDash = `${clamp((safeProgress - 72) * 0.7, 0, 100)} 100`
 
   return (
-    <div className="journey-map-card glass-card">
-      <div className="journey-map-card-head">
-        <div className="badge" style={{ marginBottom: 8 }}>🗺️ Route Map</div>
-        <p className="journey-map-card-copy">Forward and return route from Vijayawada to Kerala.</p>
+    <div className="journey-iso-card glass-card">
+      <div className="journey-iso-top">
+        <div className="badge" style={{ marginBottom: 8 }}>🗺️ 3D Isometric Journey Map</div>
+        <p className="journey-iso-copy">A small 3D world for the trip route, built only with CSS, SVG, and layered terrain.</p>
       </div>
 
-      <div className="journey-map-stack">
-        <img src={INDIA_MAP_IMAGE} alt="Map of India" className="journey-map-image" loading="lazy" />
-        <svg
-          viewBox="0 0 100 100"
-          className="journey-map-svg overlay"
-          role="img"
-          aria-label="Journey route from Vijayawada to Kochi, Munnar, Alleppey and return to Vijayawada"
-        >
-          <defs>
-            <linearGradient id="journey-forward-gradient" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#0d9488" />
-              <stop offset="100%" stopColor="#d4a853" />
-            </linearGradient>
-          </defs>
+      <div className="journey-iso-scene">
+        <div className="journey-iso-bgtext" aria-hidden="true">JOURNEY</div>
 
-          <path d={FORWARD_PATH} className="journey-forward-base" />
-          <path
-            d={FORWARD_PATH}
-            className="journey-forward-progress"
-            pathLength="100"
-            style={{ strokeDasharray: `${safeProgress} 100` }}
-          />
+        <div className="journey-iso-world" aria-hidden="true">
+          <div className="terrain-layer terrain-base" />
+          <div className="terrain-layer terrain-water kochi-water" />
+          <div className="terrain-layer terrain-water alleppey-water" />
+          <div className="terrain-layer terrain-city vijayawada-city" />
+          <div className="terrain-layer terrain-hills munnar-hills" />
+          <div className="terrain-layer terrain-green ridge-a" />
+          <div className="terrain-layer terrain-green ridge-b" />
+          <div className="terrain-layer terrain-shadow" />
 
-          <path d={RETURN_PATH} className="journey-return-path" />
+          <svg
+            viewBox="0 0 100 100"
+            className="journey-iso-svg"
+            role="img"
+            aria-label="Isometric journey map showing train, road and boat route"
+          >
+            <defs>
+              <linearGradient id="trainGlow" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#5eead4" />
+                <stop offset="100%" stopColor="#d4a853" />
+              </linearGradient>
+              <linearGradient id="roadGlow" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#60a5fa" />
+                <stop offset="100%" stopColor="#34d399" />
+              </linearGradient>
+              <linearGradient id="waterGlow" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#38bdf8" />
+                <stop offset="100%" stopColor="#0ea5e9" />
+              </linearGradient>
+            </defs>
 
-          {Object.entries(LOCATIONS).map(([id, location]) => {
-            const active = id === activeStop
-            const label = labelProps(id, location.x, location.y)
-            return (
-              <g key={id}>
-                <circle
-                  cx={location.x}
-                  cy={location.y}
-                  r={active ? 2.2 : 1.4}
-                  className={`journey-marker ${active ? 'active' : ''}`}
-                />
-                <text
-                  x={label.x}
-                  y={label.y}
-                  textAnchor={label.anchor}
-                  className={`journey-label ${active ? 'active' : ''}`}
-                >
-                  {location.label}
-                </text>
-              </g>
-            )
-          })}
-        </svg>
+            <path d={TRAIN_PATH} className="iso-path train-path-base" />
+            <path d={TRAIN_PATH} className="iso-path train-path-forward" pathLength="100" style={{ strokeDasharray: trainDash }} />
+
+            <path d={ROAD_PATH} className="iso-path road-path-base" />
+            <path d={ROAD_PATH} className="iso-path road-path-highlight" pathLength="100" style={{ strokeDasharray: roadDash }} />
+
+            <path d={RETURN_PATH} className="iso-path return-path" pathLength="100" style={{ strokeDasharray: returnDash }} />
+
+            <path d={BOAT_PATH} className="iso-path boat-path" />
+
+            <g>
+              {LOCATIONS.map((location) => (
+                <g key={location.id}>
+                  <circle
+                    cx={location.x}
+                    cy={location.y}
+                    r={activeStop === location.id ? 2.5 : 1.8}
+                    className={`iso-marker ${activeStop === location.id ? 'active' : ''}`}
+                  />
+                  <text
+                    x={location.x + (location.id === 'vijayawada' ? 2 : 2)}
+                    y={location.y + (location.id === 'vijayawada' ? -4 : location.id === 'alleppey' ? 5 : -4)}
+                    className={`iso-label ${activeStop === location.id ? 'active' : ''}`}
+                  >
+                    {location.label}
+                  </text>
+                </g>
+              ))}
+            </g>
+
+            <g className="iso-mover train-mover">
+              <text className="iso-icon">🚆</text>
+              <animateMotion dur="7s" repeatCount="indefinite" rotate="auto">
+                <mpath href="#train-mpath" />
+              </animateMotion>
+            </g>
+
+            <path id="train-mpath" d={TRAIN_PATH} fill="none" />
+
+            <g className="iso-mover car-mover">
+              <text className="iso-icon">🚗</text>
+              <animateMotion dur="10s" repeatCount="indefinite" rotate="auto">
+                <mpath href="#road-mpath" />
+              </animateMotion>
+            </g>
+
+            <path id="road-mpath" d={ROAD_PATH} fill="none" />
+
+            <g className="iso-mover boat-mover">
+              <text className="iso-icon">🛶</text>
+              <animateMotion dur="6s" repeatCount="indefinite" rotate="auto">
+                <mpath href="#boat-mpath" />
+              </animateMotion>
+            </g>
+
+            <path id="boat-mpath" d={BOAT_PATH} fill="none" />
+          </svg>
+        </div>
       </div>
 
-      <div className="journey-map-legend">
-        <span><i className="legend-stroke forward" /> Forward Journey</span>
-        <span><i className="legend-stroke return" /> Return Journey (May 26, 6:00 PM)</span>
+      <div className="journey-iso-legend">
+        <span><i className="legend-stroke train" /> Train path</span>
+        <span><i className="legend-stroke road" /> Road path</span>
+        <span><i className="legend-stroke return" /> Return path</span>
       </div>
     </div>
   )
