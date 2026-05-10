@@ -2723,10 +2723,17 @@ nav {
 .map-route-anim.is-complete {
   stroke-dashoffset: 0;
   opacity: 0.35;
+  animation: none;
+}
+
+.marker-ring {
+  transform-box: fill-box;
+  transform-origin: center;
 }
 
 .map-marker.active .marker-ring {
   animation: markerPulse 1.8s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.55));
 }
 
 @keyframes drawRouteTrain {
@@ -2773,7 +2780,12 @@ nav {
   offset-path: var(--path);
   offset-distance: 0%;
   offset-rotate: auto;
+  offset-anchor: 50% 50%;
+  transform: translate(-50%, -50%);
+  will-change: offset-distance, transform;
   filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.5));
+  animation-fill-mode: forwards;
+  animation-timing-function: linear;
 }
 
 .map-vehicle.train {
