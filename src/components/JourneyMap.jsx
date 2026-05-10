@@ -1,141 +1,169 @@
-import { useMemo } from 'react'
-
 const LOCATIONS = [
-  { id: 'vijayawada', x: 18, y: 28, label: 'Vijayawada' },
-  { id: 'kochi', x: 42, y: 43, label: 'Kochi' },
-  { id: 'munnar', x: 58, y: 26, label: 'Munnar' },
-  { id: 'alleppey', x: 74, y: 52, label: 'Alleppey' },
+  { id: 'vijayawada', x: 150, y: 100, z: 50, label: 'Vijayawada', icon: '🏠' },
+  { id: 'kochi', x: 200, y: 500, z: 10, label: 'Kochi', icon: '🌆' },
+  { id: 'munnar', x: 700, y: 200, z: 150, label: 'Munnar', icon: '⛰️' },
+  { id: 'alleppey', x: 750, y: 400, z: 5, label: 'Alleppey', icon: '🛶' },
 ]
 
-const TRAIN_PATH = 'M18 28 C26 29, 33 35, 42 43'
-const ROAD_PATH = 'M42 43 C49 38, 52 31, 58 26 C64 24, 69 38, 74 52 C67 48, 56 45, 42 43'
-const RETURN_PATH = 'M42 43 C32 37, 24 32, 18 28'
-const BOAT_PATH = 'M72 52 C77 48, 79 56, 74 60 C69 64, 66 56, 72 52'
+const TRAIN_TO_KOCHI = 'M 150,100 Q 100,300 200,500'
+const ROAD_TO_MUNNAR = 'M 200,500 Q 400,300 700,200'
+const ROAD_TO_ALLEPPEY = 'M 700,200 Q 750,300 750,400'
+const ROAD_BACK_KOCHI = 'M 750,400 Q 500,450 200,500'
+const TRAIN_RETURN = 'M 200,500 Q 100,300 150,100'
+const CAR_LOOP = 'M 200,500 Q 400,300 700,200 Q 750,300 750,400 Q 500,450 200,500'
 
-function clamp(value, min, max) {
-  return Math.max(min, Math.min(max, value))
-}
-
-function getActiveStop(progress) {
-  if (progress < 22) return 'vijayawada'
-  if (progress < 48) return 'kochi'
-  if (progress < 72) return 'munnar'
-  return 'alleppey'
-}
-
-function JourneyMap({ progress = 0 }) {
-  const safeProgress = clamp(Number(progress) || 0, 0, 100)
-  const activeStop = useMemo(() => getActiveStop(safeProgress), [safeProgress])
-
-  const trainDash = `${clamp(safeProgress * 0.6, 0, 100)} 100`
-  const roadDash = `${clamp((safeProgress - 20) * 0.9, 0, 100)} 100`
-  const returnDash = `${clamp((safeProgress - 72) * 0.7, 0, 100)} 100`
+function JourneyMap() {
+  const toPercent = (value, max) => `${(value / max) * 100}%`
 
   return (
     <div className="journey-iso-card glass-card">
       <div className="journey-iso-top">
-        <div className="badge" style={{ marginBottom: 8 }}>🗺️ 3D Isometric Journey Map</div>
-        <p className="journey-iso-copy">A small 3D world for the trip route, built only with CSS, SVG, and layered terrain.</p>
+        <div className="badge" style={{ marginBottom: 8 }}>🗺️ Kerala Journey Map</div>
+        <p className="journey-iso-copy">3D isometric route from Vijayawada to Kerala highlights. May 22-26, 2026.</p>
       </div>
 
-      <div className="journey-iso-scene">
-        <div className="journey-iso-bgtext" aria-hidden="true">JOURNEY</div>
+      <div className="journey-iso-scene kerala-iso-scene">
+        <div className="journey-iso-bgtext" aria-hidden="true">KERALA JOURNEY</div>
 
-        <div className="journey-iso-world" aria-hidden="true">
-          <div className="terrain-layer terrain-base" />
-          <div className="terrain-layer terrain-water kochi-water" />
-          <div className="terrain-layer terrain-water alleppey-water" />
-          <div className="terrain-layer terrain-city vijayawada-city" />
-          <div className="terrain-layer terrain-hills munnar-hills" />
-          <div className="terrain-layer terrain-green ridge-a" />
-          <div className="terrain-layer terrain-green ridge-b" />
-          <div className="terrain-layer terrain-shadow" />
+        <div className="journey-iso-world kerala-iso-world" aria-hidden="true">
+          <div className="kerala-iso-plane">
+            <svg
+              className="kerala-iso-svg"
+              viewBox="0 0 1000 700"
+              role="img"
+              aria-label="3D isometric Kerala journey map with train, road and backwater routes"
+            >
+              <defs>
+                <linearGradient id="landGradient" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stopColor="#6b7280" />
+                  <stop offset="45%" stopColor="#10b981" />
+                  <stop offset="100%" stopColor="#34d399" />
+                </linearGradient>
+                <linearGradient id="trainGradient" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stopColor="#8b5cf6" />
+                  <stop offset="100%" stopColor="#f59e0b" />
+                </linearGradient>
+                <pattern id="gridPattern" width="40" height="40" patternUnits="userSpaceOnUse">
+                  <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(148, 163, 184, 0.18)" strokeWidth="1" />
+                </pattern>
+              </defs>
 
-          <svg
-            viewBox="0 0 100 100"
-            className="journey-iso-svg"
-            role="img"
-            aria-label="Isometric journey map showing train, road and boat route"
-          >
-            <defs>
-              <linearGradient id="trainGlow" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#5eead4" />
-                <stop offset="100%" stopColor="#d4a853" />
-              </linearGradient>
-              <linearGradient id="roadGlow" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#60a5fa" />
-                <stop offset="100%" stopColor="#34d399" />
-              </linearGradient>
-              <linearGradient id="waterGlow" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#38bdf8" />
-                <stop offset="100%" stopColor="#0ea5e9" />
-              </linearGradient>
-            </defs>
+              <rect x="0" y="0" width="1000" height="700" fill="#1e3a5f" />
+              <rect x="0" y="0" width="1000" height="700" fill="url(#gridPattern)" opacity="0.25" />
 
-            <path d={TRAIN_PATH} className="iso-path train-path-base" />
-            <path d={TRAIN_PATH} className="iso-path train-path-forward" pathLength="100" style={{ strokeDasharray: trainDash }} />
+              <path
+                d="M 100,60 L 380,60 L 900,300 L 900,640 L 320,640 L 100,400 Z"
+                fill="url(#landGradient)"
+                opacity="0.92"
+              />
 
-            <path d={ROAD_PATH} className="iso-path road-path-base" />
-            <path d={ROAD_PATH} className="iso-path road-path-highlight" pathLength="100" style={{ strokeDasharray: roadDash }} />
+              <ellipse cx="720" cy="210" rx="170" ry="110" fill="#34d399" opacity="0.85" />
+              <g fill="#10b981" opacity="0.9">
+                {Array.from({ length: 24 }).map((_, index) => (
+                  <rect key={`tea-${index}`} x={640 + (index % 6) * 18} y={165 + Math.floor(index / 6) * 16} width="12" height="8" rx="2" />
+                ))}
+              </g>
 
-            <path d={RETURN_PATH} className="iso-path return-path" pathLength="100" style={{ strokeDasharray: returnDash }} />
+              <g fill="#3b82f6" opacity="0.8">
+                <ellipse cx="760" cy="400" rx="110" ry="70" />
+                <ellipse cx="700" cy="430" rx="70" ry="45" opacity="0.65" />
+              </g>
 
-            <path d={BOAT_PATH} className="iso-path boat-path" />
+              <g className="iso-water-ripples">
+                <circle cx="760" cy="400" r="18" />
+                <circle cx="760" cy="400" r="32" />
+                <circle cx="700" cy="430" r="20" />
+              </g>
 
-            <g>
+              <g className="iso-mountains" fill="#34d399">
+                <polygon points="650,230 700,120 750,230" />
+                <polygon points="720,240 770,140 820,240" />
+              </g>
+
+              <path d={TRAIN_TO_KOCHI} className="iso-path train-path" />
+              <path d={TRAIN_RETURN} className="iso-path train-return" />
+
+              <path d={ROAD_TO_MUNNAR} className="iso-path road-path" />
+              <path d={ROAD_TO_ALLEPPEY} className="iso-path road-path" />
+              <path d={ROAD_BACK_KOCHI} className="iso-path road-path" />
+
+              <text x="120" y="300" className="iso-path-label">22h Train Journey</text>
+              <text x="430" y="280" className="iso-path-label">150 km</text>
+              <text x="740" y="320" className="iso-path-label">160 km</text>
+              <text x="500" y="470" className="iso-path-label">75 km</text>
+
+              <g>
+                {LOCATIONS.map((location) => (
+                  <g key={location.id}>
+                    <circle cx={location.x} cy={location.y} r="10" className="iso-marker" />
+                    <text x={location.x + 14} y={location.y - 12} className="iso-label">{location.label}</text>
+                  </g>
+                ))}
+              </g>
+
+              <g className="iso-mover train-mover">
+                <text className="iso-icon">🚆</text>
+                <animateMotion dur="8s" repeatCount="indefinite" rotate="auto" keySplines="0.42 0 0.58 1" keyTimes="0;1" calcMode="spline">
+                  <mpath href="#train-path" />
+                </animateMotion>
+              </g>
+
+              <g className="iso-mover train-smoke">
+                <text className="iso-icon">💨</text>
+                <animateMotion dur="8s" repeatCount="indefinite" rotate="auto" begin="0.2s">
+                  <mpath href="#train-path" />
+                </animateMotion>
+                <animate attributeName="opacity" values="0;1;0" dur="1.6s" repeatCount="indefinite" />
+              </g>
+
+              <path id="train-path" d={TRAIN_TO_KOCHI} fill="none" />
+
+              <g className="iso-mover car-mover">
+                <text className="iso-icon">🚗</text>
+                <animateMotion dur="12s" repeatCount="indefinite" rotate="auto">
+                  <mpath href="#car-path" />
+                </animateMotion>
+              </g>
+
+              <path id="car-path" d={CAR_LOOP} fill="none" />
+            </svg>
+
+            <div className="kerala-iso-overlay">
               {LOCATIONS.map((location) => (
-                <g key={location.id}>
-                  <circle
-                    cx={location.x}
-                    cy={location.y}
-                    r={activeStop === location.id ? 2.5 : 1.8}
-                    className={`iso-marker ${activeStop === location.id ? 'active' : ''}`}
-                  />
-                  <text
-                    x={location.x + (location.id === 'vijayawada' ? 2 : 2)}
-                    y={location.y + (location.id === 'vijayawada' ? -4 : location.id === 'alleppey' ? 5 : -4)}
-                    className={`iso-label ${activeStop === location.id ? 'active' : ''}`}
-                  >
-                    {location.label}
-                  </text>
-                </g>
+                <div
+                  key={`${location.id}-icon`}
+                  className="iso-icon-marker"
+                  style={{
+                    left: toPercent(location.x, 1000),
+                    top: toPercent(location.y, 700),
+                    '--z': `${location.z}px`,
+                  }}
+                >
+                  {location.icon}
+                </div>
               ))}
-            </g>
 
-            <g className="iso-mover train-mover">
-              <text className="iso-icon">🚆</text>
-              <animateMotion dur="7s" repeatCount="indefinite" rotate="auto">
-                <mpath href="#train-mpath" />
-              </animateMotion>
-            </g>
+              <div className="iso-building" style={{ left: toPercent(150, 1000), top: toPercent(120, 700), '--z': '48px', '--w': '26px', '--h': '32px' }} />
+              <div className="iso-building" style={{ left: toPercent(175, 1000), top: toPercent(130, 700), '--z': '38px', '--w': '18px', '--h': '26px' }} />
+              <div className="iso-building" style={{ left: toPercent(210, 1000), top: toPercent(520, 700), '--z': '22px', '--w': '22px', '--h': '28px' }} />
+              <div className="iso-building" style={{ left: toPercent(235, 1000), top: toPercent(500, 700), '--z': '18px', '--w': '18px', '--h': '22px' }} />
 
-            <path id="train-mpath" d={TRAIN_PATH} fill="none" />
+              <div className="iso-boat" style={{ left: toPercent(760, 1000), top: toPercent(405, 700) }}>🛶</div>
+              <div className="iso-palm" style={{ left: toPercent(720, 1000), top: toPercent(445, 700) }}>🌴</div>
+              <div className="iso-palm" style={{ left: toPercent(790, 1000), top: toPercent(430, 700) }}>🌴</div>
 
-            <g className="iso-mover car-mover">
-              <text className="iso-icon">🚗</text>
-              <animateMotion dur="10s" repeatCount="indefinite" rotate="auto">
-                <mpath href="#road-mpath" />
-              </animateMotion>
-            </g>
-
-            <path id="road-mpath" d={ROAD_PATH} fill="none" />
-
-            <g className="iso-mover boat-mover">
-              <text className="iso-icon">🛶</text>
-              <animateMotion dur="6s" repeatCount="indefinite" rotate="auto">
-                <mpath href="#boat-mpath" />
-              </animateMotion>
-            </g>
-
-            <path id="boat-mpath" d={BOAT_PATH} fill="none" />
-          </svg>
+              <div className="iso-cloud cloud-a">☁️</div>
+              <div className="iso-cloud cloud-b">☁️</div>
+              <div className="iso-birds">•••</div>
+            </div>
+          </div>
         </div>
       </div>
 
       <div className="journey-iso-legend">
-        <span><i className="legend-stroke train" /> Train path</span>
-        <span><i className="legend-stroke road" /> Road path</span>
-        <span><i className="legend-stroke return" /> Return path</span>
+        <span><i className="legend-stroke train" /> Train (Vijayawada → Kochi)</span>
+        <span><i className="legend-stroke road" /> Road (Kochi → Munnar → Alleppey → Kochi)</span>
+        <span><i className="legend-stroke return" /> Return train (Kochi → Vijayawada)</span>
       </div>
     </div>
   )
