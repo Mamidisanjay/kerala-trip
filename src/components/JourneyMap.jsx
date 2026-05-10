@@ -15,6 +15,8 @@ const PATHS = {
 
 const LAND_SHAPE = 'M120 70 C210 40 380 40 520 90 C640 130 680 220 650 320 C620 430 470 470 300 450 C160 430 90 340 90 230 C90 150 100 90 120 70 Z'
 const WATER_SHAPE = 'M460 260 C520 230 610 240 640 290 C670 340 650 400 580 410 C520 420 470 380 450 330 C440 300 445 275 460 260 Z'
+const MAP_WIDTH = 700
+const MAP_HEIGHT = 500
 
 const STEP_DURATIONS = {
   trainOut: 4000,
@@ -25,6 +27,9 @@ const STEP_DURATIONS = {
 function JourneyMap() {
   const [step, setStep] = useState(1)
   const [activePulse, setActivePulse] = useState(null)
+
+  const toPercentX = (value) => `${(value / MAP_WIDTH) * 100}%`
+  const toPercentY = (value) => `${(value / MAP_HEIGHT) * 100}%`
 
   useEffect(() => {
     let timers = []
@@ -102,20 +107,25 @@ function JourneyMap() {
             </circle>
           </g>
 
+          <path d={PATHS.train} className="map-route-base train" />
           <path
             d={PATHS.train}
-            pathLength="1"
-            className={`map-route train ${step === 1 ? 'draw-train' : ''} ${step > 1 ? 'route-complete' : ''}`}
+            pathLength="100"
+            className={`map-route-anim train ${step === 1 ? 'is-active' : ''} ${step > 1 ? 'is-complete' : ''}`}
           />
+
+          <path d={PATHS.road} className="map-route-base road" />
           <path
             d={PATHS.road}
-            pathLength="1"
-            className={`map-route road ${step === 2 ? 'draw-road' : ''} ${step > 2 ? 'route-complete' : ''}`}
+            pathLength="100"
+            className={`map-route-anim road ${step === 2 ? 'is-active' : ''} ${step > 2 ? 'is-complete' : ''}`}
           />
+
+          <path d={PATHS.trainReturn} className="map-route-base return" />
           <path
             d={PATHS.trainReturn}
-            pathLength="1"
-            className={`map-route return ${step === 3 ? 'draw-return' : ''}`}
+            pathLength="100"
+            className={`map-route-anim return ${step === 3 ? 'is-active' : ''}`}
           />
 
           <text x="250" y="210" fill="white" fontSize="12" opacity="0.55">150 km</text>
@@ -123,50 +133,48 @@ function JourneyMap() {
 
           {LOCATIONS.map((location) => (
             <g key={location.id} className={`map-marker ${activePulse === location.id ? 'active' : ''}`}>
-              <circle cx={location.x} cy={location.y} r="10" fill={location.color} opacity="0.85" />
-              <circle cx={location.x} cy={location.y} r="16" stroke={location.color} strokeWidth="2" fill="none" opacity="0.4" />
+              <circle className="marker-core" cx={location.x} cy={location.y} r="10" fill={location.color} opacity="0.85" />
+              <circle className="marker-ring" cx={location.x} cy={location.y} r="16" stroke={location.color} strokeWidth="2" fill="none" opacity="0.4" />
               <text x={location.x + 14} y={location.y + 4} fill="white" fontSize="12" fontWeight="600">{location.name}</text>
             </g>
           ))}
-
-          {step === 1 && (
-            <g key="train-out">
-              <text fontSize="20">🚆
-                <animateMotion dur="4s" repeatCount="1" rotate="auto">
-                  <mpath href="#trainPath2d" />
-                </animateMotion>
-              </text>
-              <path id="trainPath2d" d={PATHS.train} fill="none" />
-            </g>
-          )}
-
-          {step === 2 && (
-            <g key="car-trip">
-              <text fontSize="18">🚗
-                <animateMotion dur="5s" repeatCount="1" rotate="auto">
-                  <mpath href="#roadPath2d" />
-                </animateMotion>
-              </text>
-              <path id="roadPath2d" d={PATHS.road} fill="none" />
-            </g>
-          )}
-
-          {step === 3 && (
-            <g key="train-return">
-              <text fontSize="20">🚆
-                <animateMotion dur="4s" repeatCount="1" rotate="auto">
-                  <mpath href="#returnPath2d" />
-                </animateMotion>
-              </text>
-              <path id="returnPath2d" d={PATHS.trainReturn} fill="none" />
-            </g>
-          )}
-          <g>
-            <text x="540" y="330" fontSize="18">🛶
-              <animateTransform attributeName="transform" type="translate" values="0 0; 0 -4; 0 0" dur="3s" repeatCount="indefinite" />
-            </text>
-          </g>
         </svg>
+
+        <div className="map-vehicle-layer">
+          {step === 1 && (
+            <div
+              key={`train-${step}`}
+              className="map-vehicle train"
+              style={{ '--path': `path('${PATHS.train}')` }}
+            >
+              🚆
+            </div>
+          )}
+          {step === 2 && (
+            <div
+              key={`car-${step}`}
+              className="map-vehicle car"
+              style={{ '--path': `path('${PATHS.road}')` }}
+            >
+              🚗
+            </div>
+          )}
+          {step === 3 && (
+            <div
+              key={`train-return-${step}`}
+              className="map-vehicle train return"
+              style={{ '--path': `path('${PATHS.trainReturn}')` }}
+            >
+              🚆
+            </div>
+          )}
+          <div
+            className="map-vehicle boat"
+            style={{ left: toPercentX(540), top: toPercentY(330) }}
+          >
+            🛶
+          </div>
+        </div>
       </div>
     </div>
   )

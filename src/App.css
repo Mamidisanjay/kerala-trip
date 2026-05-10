@@ -2653,47 +2653,85 @@ nav {
   stroke-dashoffset: 1;
 }
 
-.map-route.train {
-  stroke: url(#routeGlow);
-  stroke-width: 4;
-  stroke-dasharray: 12 8;
+.map-route-base {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.18;
 }
 
-.map-route.road {
+.map-route-base.train {
+  stroke: #f472b6;
+  stroke-width: 3.5;
+  stroke-dasharray: 10 8;
+}
+
+.map-route-base.road {
   stroke: #64748b;
   stroke-width: 3;
 }
 
-.map-route.return {
+.map-route-base.return {
   stroke: #f59e0b;
   stroke-width: 2.5;
   stroke-dasharray: 6 6;
-  opacity: 0.7;
 }
 
-.map-route.draw-train {
+.map-route-anim {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  opacity: 0;
+}
+
+.map-route-anim.train {
+  stroke: url(#routeGlow);
+  stroke-width: 4;
+  filter: drop-shadow(0 0 10px rgba(244, 114, 182, 0.45));
+}
+
+.map-route-anim.road {
+  stroke: #94a3b8;
+  stroke-width: 3;
+  filter: drop-shadow(0 0 8px rgba(148, 163, 184, 0.4));
+}
+
+.map-route-anim.return {
+  stroke: #f59e0b;
+  stroke-width: 2.5;
+  filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.45));
+}
+
+.map-route-anim.is-active {
+  opacity: 1;
+}
+
+.map-route-anim.is-active.train {
   animation: drawRouteTrain 4s linear forwards;
 }
 
-.map-route.draw-road {
+.map-route-anim.is-active.road {
   animation: drawRouteRoad 5s linear forwards;
 }
 
-.map-route.draw-return {
+.map-route-anim.is-active.return {
   animation: drawRouteReturn 4s linear forwards;
 }
 
-.map-route.route-complete {
+.map-route-anim.is-complete {
+  stroke-dashoffset: 0;
   opacity: 0.35;
 }
 
-.map-marker.active circle:last-of-type {
+.map-marker.active .marker-ring {
   animation: markerPulse 1.8s ease-in-out infinite;
 }
 
 @keyframes drawRouteTrain {
   from {
-    stroke-dashoffset: 1;
+    stroke-dashoffset: 100;
   }
 
   to {
@@ -2703,7 +2741,7 @@ nav {
 
 @keyframes drawRouteRoad {
   from {
-    stroke-dashoffset: 1;
+    stroke-dashoffset: 100;
   }
 
   to {
@@ -2713,11 +2751,81 @@ nav {
 
 @keyframes drawRouteReturn {
   from {
-    stroke-dashoffset: 1;
+    stroke-dashoffset: 100;
   }
 
   to {
     stroke-dashoffset: 0;
+  }
+}
+
+.map-vehicle-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.map-vehicle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 22px;
+  offset-path: var(--path);
+  offset-distance: 0%;
+  offset-rotate: auto;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.5));
+}
+
+.map-vehicle.train {
+  animation: vehicleMoveTrain 4s linear forwards;
+}
+
+.map-vehicle.train.return {
+  animation: vehicleMoveReturn 4s linear forwards;
+}
+
+.map-vehicle.car {
+  animation: vehicleMoveCar 5s linear forwards;
+}
+
+.map-vehicle.boat {
+  transform: translate(-50%, -50%);
+  animation: boatBob 3s ease-in-out infinite;
+}
+
+@keyframes vehicleMoveTrain {
+  from {
+    offset-distance: 0%;
+    opacity: 1;
+  }
+
+  to {
+    offset-distance: 100%;
+    opacity: 1;
+  }
+}
+
+@keyframes vehicleMoveCar {
+  from {
+    offset-distance: 0%;
+    opacity: 1;
+  }
+
+  to {
+    offset-distance: 100%;
+    opacity: 1;
+  }
+}
+
+@keyframes vehicleMoveReturn {
+  from {
+    offset-distance: 0%;
+    opacity: 1;
+  }
+
+  to {
+    offset-distance: 100%;
+    opacity: 1;
   }
 }
 
