@@ -1,19 +1,64 @@
+import { useState } from 'react'
+import { motion } from 'framer-motion'
+
 const LOCATIONS = [
-  { id: 'vijayawada', x: 150, y: 100, z: 50, label: 'Vijayawada', icon: '🏠' },
-  { id: 'kochi', x: 200, y: 500, z: 10, label: 'Kochi', icon: '🌆' },
-  { id: 'munnar', x: 700, y: 200, z: 150, label: 'Munnar', icon: '⛰️' },
-  { id: 'alleppey', x: 750, y: 400, z: 5, label: 'Alleppey', icon: '🛶' },
+  {
+    id: 'vijayawada',
+    name: 'Vijayawada',
+    emoji: '🏠',
+    x: 200,
+    y: 100,
+    color: '#f59e0b',
+    type: 'start',
+    date: 'May 22, 3:50 AM',
+    description: 'Journey Begins',
+  },
+  {
+    id: 'kochi',
+    name: 'Kochi',
+    emoji: '🌆',
+    x: 150,
+    y: 350,
+    color: '#f59e0b',
+    type: 'arrival',
+    date: 'May 23, 2:00 AM',
+    description: 'Gateway to Kerala',
+  },
+  {
+    id: 'munnar',
+    name: 'Munnar',
+    emoji: '⛰️',
+    x: 500,
+    y: 200,
+    color: '#f59e0b',
+    type: 'destination',
+    date: 'May 23-24',
+    description: 'Tea Gardens & Hills',
+  },
+  {
+    id: 'alleppey',
+    name: 'Alleppey',
+    emoji: '🛶',
+    x: 480,
+    y: 380,
+    color: '#f59e0b',
+    type: 'destination',
+    date: 'May 25',
+    description: 'Backwater Paradise',
+  },
 ]
 
-const TRAIN_TO_KOCHI = 'M 150,100 Q 100,300 200,500'
-const ROAD_TO_MUNNAR = 'M 200,500 Q 400,300 700,200'
-const ROAD_TO_ALLEPPEY = 'M 700,200 Q 750,300 750,400'
-const ROAD_BACK_KOCHI = 'M 750,400 Q 500,450 200,500'
-const TRAIN_RETURN = 'M 200,500 Q 100,300 150,100'
-const CAR_LOOP = 'M 200,500 Q 400,300 700,200 Q 750,300 750,400 Q 500,450 200,500'
+const PATHS = {
+  train: 'M 200,100 Q 150,200 150,350',
+  roadToMunnar: 'M 150,350 Q 300,250 500,200',
+  roadToAlleppey: 'M 500,200 Q 520,280 480,380',
+  roadBackToKochi: 'M 480,380 Q 350,400 150,350',
+  trainReturn: 'M 150,350 Q 150,200 200,100',
+  carLoop: 'M 150,350 Q 300,250 500,200 Q 520,280 480,380 Q 350,400 150,350',
+}
 
 function JourneyMap() {
-  const toPercent = (value, max) => `${(value / max) * 100}%`
+  const [hoveredLocation, setHoveredLocation] = useState(null)
 
   return (
     <div className="journey-iso-card glass-card">
@@ -22,149 +67,261 @@ function JourneyMap() {
         <p className="journey-iso-copy">3D isometric route from Vijayawada to Kerala highlights. May 22-26, 2026.</p>
       </div>
 
-      <div className="journey-iso-scene kerala-iso-scene">
-        <div className="journey-iso-bgtext" aria-hidden="true">KERALA JOURNEY</div>
-
-        <div className="journey-iso-world kerala-iso-world" aria-hidden="true">
-          <div className="kerala-iso-plane">
+      <div className="relative w-full h-[520px] md:h-[640px]">
+        <motion.div
+          className="absolute inset-0 flex items-center justify-center"
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1 }}
+          style={{ perspective: '2000px', perspectiveOrigin: 'center center' }}
+        >
+          <div
+            className="relative w-full max-w-4xl h-full"
+            style={{ transformStyle: 'preserve-3d', transform: 'rotateX(60deg) rotateZ(-45deg) scale(1.05)' }}
+          >
             <svg
-              className="kerala-iso-svg"
-              viewBox="0 0 1000 700"
+              className="absolute inset-0 w-full h-full"
+              viewBox="0 0 700 500"
               role="img"
               aria-label="3D isometric Kerala journey map with train, road and backwater routes"
+              style={{ transform: 'translateZ(0px)' }}
             >
               <defs>
-                <linearGradient id="landGradient" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stopColor="#6b7280" />
-                  <stop offset="45%" stopColor="#10b981" />
+                <linearGradient id="oceanGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#1e3a8a" />
+                  <stop offset="100%" stopColor="#0f172a" />
+                </linearGradient>
+                <linearGradient id="landGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#059669" />
+                  <stop offset="50%" stopColor="#10b981" />
                   <stop offset="100%" stopColor="#34d399" />
                 </linearGradient>
-                <linearGradient id="trainGradient" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stopColor="#8b5cf6" />
-                  <stop offset="100%" stopColor="#f59e0b" />
-                </linearGradient>
-                <pattern id="gridPattern" width="40" height="40" patternUnits="userSpaceOnUse">
-                  <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(148, 163, 184, 0.18)" strokeWidth="1" />
-                </pattern>
               </defs>
 
-              <rect x="0" y="0" width="1000" height="700" fill="#1e3a5f" />
-              <rect x="0" y="0" width="1000" height="700" fill="url(#gridPattern)" opacity="0.25" />
+              <rect x="0" y="0" width="700" height="500" fill="url(#oceanGradient)" />
 
-              <path
-                d="M 100,60 L 380,60 L 900,300 L 900,640 L 320,640 L 100,400 Z"
-                fill="url(#landGradient)"
-                opacity="0.92"
+              <ellipse cx="350" cy="280" rx="280" ry="180" fill="url(#landGradient)" opacity="0.95" />
+
+              <ellipse cx="500" cy="200" rx="120" ry="80" fill="#4ade80" opacity="0.8" />
+
+              <ellipse cx="480" cy="380" rx="90" ry="50" fill="#3b82f6" opacity="0.7">
+                <animate attributeName="opacity" values="0.5;0.8;0.5" dur="4s" repeatCount="indefinite" />
+              </ellipse>
+              <ellipse cx="440" cy="360" rx="30" ry="20" fill="#60a5fa" opacity="0.6" />
+              <ellipse cx="520" cy="400" rx="25" ry="15" fill="#60a5fa" opacity="0.6" />
+
+              <motion.path
+                d={PATHS.train}
+                stroke="#ec4899"
+                strokeWidth="3"
+                strokeDasharray="10 5"
+                fill="none"
+                strokeLinecap="round"
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{ pathLength: 1, opacity: 0.9 }}
+                transition={{ duration: 2, delay: 0.5 }}
               />
 
-              <ellipse cx="720" cy="210" rx="170" ry="110" fill="#34d399" opacity="0.85" />
-              <g fill="#10b981" opacity="0.9">
-                {Array.from({ length: 24 }).map((_, index) => (
-                  <rect key={`tea-${index}`} x={640 + (index % 6) * 18} y={165 + Math.floor(index / 6) * 16} width="12" height="8" rx="2" />
-                ))}
-              </g>
+              <motion.path
+                d={PATHS.roadToMunnar}
+                stroke="#6b7280"
+                strokeWidth="2.5"
+                fill="none"
+                strokeLinecap="round"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 2, delay: 1 }}
+              />
 
-              <g fill="#3b82f6" opacity="0.8">
-                <ellipse cx="760" cy="400" rx="110" ry="70" />
-                <ellipse cx="700" cy="430" rx="70" ry="45" opacity="0.65" />
-              </g>
+              <motion.path
+                d={PATHS.roadToAlleppey}
+                stroke="#6b7280"
+                strokeWidth="2.5"
+                fill="none"
+                strokeLinecap="round"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 2, delay: 1.5 }}
+              />
 
-              <g className="iso-water-ripples">
-                <circle cx="760" cy="400" r="18" />
-                <circle cx="760" cy="400" r="32" />
-                <circle cx="700" cy="430" r="20" />
-              </g>
+              <motion.path
+                d={PATHS.roadBackToKochi}
+                stroke="#6b7280"
+                strokeWidth="2.5"
+                fill="none"
+                strokeLinecap="round"
+                strokeDasharray="5 3"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 2, delay: 2 }}
+              />
 
-              <g className="iso-mountains" fill="#34d399">
-                <polygon points="650,230 700,120 750,230" />
-                <polygon points="720,240 770,140 820,240" />
-              </g>
+              <motion.path
+                d={PATHS.trainReturn}
+                stroke="#a78bfa"
+                strokeWidth="2"
+                strokeDasharray="8 4"
+                fill="none"
+                strokeLinecap="round"
+                opacity="0.6"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 2, delay: 2.5 }}
+              />
 
-              <path d={TRAIN_TO_KOCHI} className="iso-path train-path" />
-              <path d={TRAIN_RETURN} className="iso-path train-return" />
-
-              <path d={ROAD_TO_MUNNAR} className="iso-path road-path" />
-              <path d={ROAD_TO_ALLEPPEY} className="iso-path road-path" />
-              <path d={ROAD_BACK_KOCHI} className="iso-path road-path" />
-
-              <text x="120" y="300" className="iso-path-label">22h Train Journey</text>
-              <text x="430" y="280" className="iso-path-label">150 km</text>
-              <text x="740" y="320" className="iso-path-label">160 km</text>
-              <text x="500" y="470" className="iso-path-label">75 km</text>
+              <text x="250" y="180" fill="white" fontSize="10" opacity="0.6">150 km</text>
+              <text x="450" y="290" fill="white" fontSize="10" opacity="0.6">160 km</text>
 
               <g>
                 {LOCATIONS.map((location) => (
                   <g key={location.id}>
-                    <circle cx={location.x} cy={location.y} r="10" className="iso-marker" />
-                    <text x={location.x + 14} y={location.y - 12} className="iso-label">{location.label}</text>
+                    <circle cx={location.x} cy={location.y} r="10" fill={location.color} opacity="0.9" />
+                    <text x={location.x + 14} y={location.y - 12} fill="white" fontSize="12">{location.name}</text>
                   </g>
                 ))}
               </g>
 
-              <g className="iso-mover train-mover">
-                <text className="iso-icon">🚆</text>
-                <animateMotion dur="8s" repeatCount="indefinite" rotate="auto" keySplines="0.42 0 0.58 1" keyTimes="0;1" calcMode="spline">
-                  <mpath href="#train-path" />
-                </animateMotion>
+              <g>
+                <text fontSize="20">
+                  <animateMotion dur="10s" repeatCount="indefinite" rotate="auto">
+                    <mpath href="#trainPath" />
+                  </animateMotion>
+                  🚆
+                </text>
+                <path id="trainPath" d={PATHS.train} fill="none" />
               </g>
 
-              <g className="iso-mover train-smoke">
-                <text className="iso-icon">💨</text>
-                <animateMotion dur="8s" repeatCount="indefinite" rotate="auto" begin="0.2s">
-                  <mpath href="#train-path" />
-                </animateMotion>
-                <animate attributeName="opacity" values="0;1;0" dur="1.6s" repeatCount="indefinite" />
+              <g>
+                <text fontSize="18">
+                  <animateMotion dur="14s" repeatCount="indefinite" rotate="auto">
+                    <mpath href="#carPath" />
+                  </animateMotion>
+                  🚗
+                </text>
+                <path id="carPath" d={PATHS.carLoop} fill="none" />
               </g>
-
-              <path id="train-path" d={TRAIN_TO_KOCHI} fill="none" />
-
-              <g className="iso-mover car-mover">
-                <text className="iso-icon">🚗</text>
-                <animateMotion dur="12s" repeatCount="indefinite" rotate="auto">
-                  <mpath href="#car-path" />
-                </animateMotion>
-              </g>
-
-              <path id="car-path" d={CAR_LOOP} fill="none" />
             </svg>
 
-            <div className="kerala-iso-overlay">
-              {LOCATIONS.map((location) => (
+            <div
+              className="absolute bg-slate-600 rounded-sm"
+              style={{ left: '180px', top: '85px', width: '20px', height: '30px', transform: 'translateZ(15px)', boxShadow: '4px 4px 8px rgba(0,0,0,0.5)' }}
+            />
+            <div
+              className="absolute bg-slate-500 rounded-sm"
+              style={{ left: '205px', top: '95px', width: '18px', height: '25px', transform: 'translateZ(12px)', boxShadow: '4px 4px 8px rgba(0,0,0,0.5)' }}
+            />
+            <div
+              className="absolute bg-slate-500 rounded-sm"
+              style={{ left: '130px', top: '340px', width: '18px', height: '28px', transform: 'translateZ(14px)', boxShadow: '4px 4px 8px rgba(0,0,0,0.5)' }}
+            />
+            <div
+              className="absolute bg-slate-600 rounded-sm"
+              style={{ left: '152px', top: '348px', width: '16px', height: '22px', transform: 'translateZ(11px)', boxShadow: '4px 4px 8px rgba(0,0,0,0.5)' }}
+            />
+
+            <motion.div
+              className="absolute text-2xl"
+              style={{ left: '480px', top: '380px' }}
+              animate={{ y: [0, -3, 0], rotate: [-2, 2, -2] }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              🛶
+            </motion.div>
+
+            {LOCATIONS.map((location, index) => (
+              <motion.div
+                key={location.id}
+                className="absolute cursor-pointer"
+                style={{ left: `${location.x}px`, top: `${location.y}px`, transformStyle: 'preserve-3d', transform: 'translateZ(20px)' }}
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: index * 0.3 + 1, duration: 0.5 }}
+                whileHover={{ scale: 1.2 }}
+                onHoverStart={() => setHoveredLocation(location.id)}
+                onHoverEnd={() => setHoveredLocation(null)}
+              >
+                <motion.div
+                  className="absolute -inset-3 rounded-full border-2 opacity-50"
+                  style={{ borderColor: location.color }}
+                  animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0.8, 0.5] }}
+                  transition={{ duration: 2, repeat: Infinity, delay: index * 0.5 }}
+                />
+
                 <div
-                  key={`${location.id}-icon`}
-                  className="iso-icon-marker"
-                  style={{
-                    left: toPercent(location.x, 1000),
-                    top: toPercent(location.y, 700),
-                    '--z': `${location.z}px`,
-                  }}
+                  className="w-8 h-8 rounded-full flex items-center justify-center shadow-lg"
+                  style={{ backgroundColor: location.color, boxShadow: `0 0 20px ${location.color}80` }}
                 >
-                  {location.icon}
+                  <span className="text-lg">{location.emoji}</span>
                 </div>
-              ))}
 
-              <div className="iso-building" style={{ left: toPercent(150, 1000), top: toPercent(120, 700), '--z': '48px', '--w': '26px', '--h': '32px' }} />
-              <div className="iso-building" style={{ left: toPercent(175, 1000), top: toPercent(130, 700), '--z': '38px', '--w': '18px', '--h': '26px' }} />
-              <div className="iso-building" style={{ left: toPercent(210, 1000), top: toPercent(520, 700), '--z': '22px', '--w': '22px', '--h': '28px' }} />
-              <div className="iso-building" style={{ left: toPercent(235, 1000), top: toPercent(500, 700), '--z': '18px', '--w': '18px', '--h': '22px' }} />
+                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
+                  <div className="text-white text-xs md:text-sm font-bold">{location.name}</div>
+                </div>
 
-              <div className="iso-boat" style={{ left: toPercent(760, 1000), top: toPercent(405, 700) }}>🛶</div>
-              <div className="iso-palm" style={{ left: toPercent(720, 1000), top: toPercent(445, 700) }}>🌴</div>
-              <div className="iso-palm" style={{ left: toPercent(790, 1000), top: toPercent(430, 700) }}>🌴</div>
+                {hoveredLocation === location.id && (
+                  <motion.div
+                    className="absolute -top-20 left-1/2 -translate-x-1/2 bg-slate-800/95 backdrop-blur-sm rounded-lg p-3 border border-slate-700 shadow-2xl z-50 min-w-[160px]"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    style={{ transform: 'translateZ(50px) translateX(-50%)' }}
+                  >
+                    <div className="text-white text-xs font-semibold mb-1">{location.name}</div>
+                    <div className="text-slate-300 text-xs mb-1">{location.date}</div>
+                    <div className="text-slate-400 text-xs">{location.description}</div>
+                  </motion.div>
+                )}
+              </motion.div>
+            ))}
 
-              <div className="iso-cloud cloud-a">☁️</div>
-              <div className="iso-cloud cloud-b">☁️</div>
-              <div className="iso-birds">•••</div>
-            </div>
+            {Array.from({ length: 4 }).map((_, index) => (
+              <motion.div
+                key={`palm-${index}`}
+                className="absolute text-2xl opacity-40"
+                style={{ left: `${440 + index * 20}px`, top: `${350 + (index % 2) * 15}px`, transform: 'translateZ(5px)' }}
+                animate={{ rotate: [-3, 3, -3] }}
+                transition={{ duration: 3 + index * 0.5, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                🌴
+              </motion.div>
+            ))}
+
+            {Array.from({ length: 3 }).map((_, index) => (
+              <motion.div
+                key={`cloud-${index}`}
+                className="absolute text-3xl opacity-20"
+                style={{ left: `${460 + index * 30}px`, top: `${160 + index * 10}px`, transform: 'translateZ(30px)' }}
+                animate={{ x: [0, 10, 0], opacity: [0.1, 0.2, 0.1] }}
+                transition={{ duration: 8 + index * 2, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                ☁️
+              </motion.div>
+            ))}
           </div>
-        </div>
+        </motion.div>
       </div>
 
-      <div className="journey-iso-legend">
-        <span><i className="legend-stroke train" /> Train (Vijayawada → Kochi)</span>
-        <span><i className="legend-stroke road" /> Road (Kochi → Munnar → Alleppey → Kochi)</span>
-        <span><i className="legend-stroke return" /> Return train (Kochi → Vijayawada)</span>
-      </div>
+      <motion.div
+        className="mt-6 flex flex-wrap justify-center gap-6 text-sm"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 3 }}
+      >
+        <div className="flex items-center gap-2">
+          <div
+            className="w-8 h-0.5 bg-pink-500 rounded"
+            style={{ backgroundImage: 'repeating-linear-gradient(to right, #ec4899 0, #ec4899 10px, transparent 10px, transparent 15px)' }}
+          />
+          <span className="text-slate-400">Train Journey</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-0.5 bg-gray-500 rounded" />
+          <span className="text-slate-400">Road Route</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 rounded-full bg-amber-500" />
+          <span className="text-slate-400">Destinations</span>
+        </div>
+      </motion.div>
     </div>
   )
 }
