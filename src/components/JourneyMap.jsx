@@ -172,34 +172,9 @@ function JourneyMap() {
               <text x="250" y="180" fill="white" fontSize="10" opacity="0.6">150 km</text>
               <text x="450" y="290" fill="white" fontSize="10" opacity="0.6">160 km</text>
 
-              <g>
-                {LOCATIONS.map((location) => (
-                  <g key={location.id}>
-                    <circle cx={location.x} cy={location.y} r="10" fill={location.color} opacity="0.9" />
-                    <text x={location.x + 14} y={location.y - 12} fill="white" fontSize="12">{location.name}</text>
-                  </g>
-                ))}
-              </g>
-
-              <g>
-                <text fontSize="20">
-                  <animateMotion dur="10s" repeatCount="indefinite" rotate="auto">
-                    <mpath href="#trainPath" />
-                  </animateMotion>
-                  🚆
-                </text>
-                <path id="trainPath" d={PATHS.train} fill="none" />
-              </g>
-
-              <g>
-                <text fontSize="18">
-                  <animateMotion dur="14s" repeatCount="indefinite" rotate="auto">
-                    <mpath href="#carPath" />
-                  </animateMotion>
-                  🚗
-                </text>
-                <path id="carPath" d={PATHS.carLoop} fill="none" />
-              </g>
+              <path id="trainPath" d={PATHS.train} fill="none" />
+              <path id="carPath" d={PATHS.carLoop} fill="none" />
+              <path id="trainReturnPath" d={PATHS.trainReturn} fill="none" />
             </svg>
 
             <div
@@ -228,11 +203,20 @@ function JourneyMap() {
               🛶
             </motion.div>
 
+            <div className="seq-vehicle seq-train" style={{ offsetPath: `path('${PATHS.train}')` }}>🚆</div>
+            <div className="seq-vehicle seq-car" style={{ offsetPath: `path('${PATHS.carLoop}')` }}>🚗</div>
+            <div className="seq-vehicle seq-train-return" style={{ offsetPath: `path('${PATHS.trainReturn}')` }}>🚆</div>
+
             {LOCATIONS.map((location, index) => (
               <motion.div
                 key={location.id}
                 className="absolute cursor-pointer"
-                style={{ left: `${location.x}px`, top: `${location.y}px`, transformStyle: 'preserve-3d', transform: 'translateZ(20px)' }}
+                style={{
+                  left: `${location.x}px`,
+                  top: `${location.y}px`,
+                  transformStyle: 'preserve-3d',
+                  transform: 'translate3d(-50%, -50%, 20px)',
+                }}
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: index * 0.3 + 1, duration: 0.5 }}

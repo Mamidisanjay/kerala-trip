@@ -2645,6 +2645,93 @@ nav {
   color: #cbd5e1;
 }
 
+.seq-vehicle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 28px;
+  offset-distance: 0%;
+  offset-rotate: auto;
+  animation-duration: 18s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.45));
+}
+
+.seq-train {
+  animation-name: trainForward;
+}
+
+.seq-car {
+  animation-name: carTrip;
+}
+
+.seq-train-return {
+  animation-name: trainReturn;
+}
+
+@keyframes trainForward {
+  0% {
+    offset-distance: 0%;
+    opacity: 1;
+  }
+
+  33% {
+    offset-distance: 100%;
+    opacity: 1;
+  }
+
+  34% {
+    opacity: 0;
+  }
+
+  100% {
+    offset-distance: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes carTrip {
+  0% {
+    opacity: 0;
+  }
+
+  33% {
+    offset-distance: 0%;
+    opacity: 1;
+  }
+
+  77% {
+    offset-distance: 100%;
+    opacity: 1;
+  }
+
+  78% {
+    opacity: 0;
+  }
+
+  100% {
+    offset-distance: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes trainReturn {
+  0% {
+    opacity: 0;
+  }
+
+  77% {
+    offset-distance: 0%;
+    opacity: 1;
+  }
+
+  100% {
+    offset-distance: 100%;
+    opacity: 1;
+  }
+}
+
 .journey-iso-legend span {
   display: inline-flex;
   align-items: center;
