@@ -1,311 +1,145 @@
-import { useState } from 'react'
 import { motion } from 'framer-motion'
 
 const LOCATIONS = [
-  {
-    id: 'vijayawada',
-    name: 'Vijayawada',
-    emoji: '🏠',
-    x: 200,
-    y: 100,
-    color: '#f59e0b',
-    type: 'start',
-    date: 'May 22, 3:50 AM',
-    description: 'Journey Begins',
-  },
-  {
-    id: 'kochi',
-    name: 'Kochi',
-    emoji: '🌆',
-    x: 150,
-    y: 350,
-    color: '#f59e0b',
-    type: 'arrival',
-    date: 'May 23, 2:00 AM',
-    description: 'Gateway to Kerala',
-  },
-  {
-    id: 'munnar',
-    name: 'Munnar',
-    emoji: '⛰️',
-    x: 500,
-    y: 200,
-    color: '#f59e0b',
-    type: 'destination',
-    date: 'May 23-24',
-    description: 'Tea Gardens & Hills',
-  },
-  {
-    id: 'alleppey',
-    name: 'Alleppey',
-    emoji: '🛶',
-    x: 480,
-    y: 380,
-    color: '#f59e0b',
-    type: 'destination',
-    date: 'May 25',
-    description: 'Backwater Paradise',
-  },
+  { id: 'vijayawada', name: 'Vijayawada', emoji: '🏠', x: 130, y: 110, color: '#f59e0b' },
+  { id: 'kochi', name: 'Kochi', emoji: '🌆', x: 140, y: 360, color: '#f59e0b' },
+  { id: 'munnar', name: 'Munnar', emoji: '⛰️', x: 480, y: 170, color: '#f59e0b' },
+  { id: 'alleppey', name: 'Alleppey', emoji: '🛶', x: 520, y: 330, color: '#f59e0b' },
 ]
 
 const PATHS = {
-  train: 'M 200,100 Q 150,200 150,350',
-  roadToMunnar: 'M 150,350 Q 300,250 500,200',
-  roadToAlleppey: 'M 500,200 Q 520,280 480,380',
-  roadBackToKochi: 'M 480,380 Q 350,400 150,350',
-  trainReturn: 'M 150,350 Q 150,200 200,100',
-  carLoop: 'M 150,350 Q 300,250 500,200 Q 520,280 480,380 Q 350,400 150,350',
+  train: 'M 130,110 Q 110,220 140,360',
+  road: 'M 140,360 Q 300,260 480,170 Q 530,240 520,330',
+  trainReturn: 'M 140,360 Q 110,220 130,110',
 }
 
-function JourneyMap() {
-  const [hoveredLocation, setHoveredLocation] = useState(null)
+const LAND_SHAPE = 'M120 70 C210 40 380 40 520 90 C640 130 680 220 650 320 C620 430 470 470 300 450 C160 430 90 340 90 230 C90 150 100 90 120 70 Z'
+const WATER_SHAPE = 'M460 260 C520 230 610 240 640 290 C670 340 650 400 580 410 C520 420 470 380 450 330 C440 300 445 275 460 260 Z'
 
+function JourneyMap() {
   return (
     <div className="journey-iso-card glass-card">
       <div className="journey-iso-top">
         <div className="badge" style={{ marginBottom: 8 }}>🗺️ Kerala Journey Map</div>
-        <p className="journey-iso-copy">3D isometric route from Vijayawada to Kerala highlights. May 22-26, 2026.</p>
+        <p className="journey-iso-copy">Flat 2D animated route from Vijayawada to Kerala highlights. May 22-26, 2026.</p>
       </div>
 
-      <div className="relative w-full h-[520px] md:h-[640px]">
-        <motion.div
-          className="absolute inset-0 flex items-center justify-center"
-          initial={{ opacity: 0, scale: 0.96 }}
+      <div className="relative w-full h-[520px] md:h-[600px] overflow-hidden rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(56,189,248,0.18),transparent_45%),radial-gradient(circle_at_80%_70%,rgba(16,185,129,0.15),transparent_45%)]" />
+          <div className="absolute inset-0 flex items-center justify-center text-5xl md:text-7xl font-semibold text-white/5 tracking-[0.45em]">JOURNEY</div>
+        </div>
+
+        <motion.svg
+          className="absolute inset-0 w-full h-full"
+          viewBox="0 0 700 500"
+          role="img"
+          aria-label="2D journey map with train, road and backwater routes"
+          initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1 }}
-          style={{ perspective: '2000px', perspectiveOrigin: 'center center' }}
         >
-          <div
-            className="relative w-full max-w-4xl h-full"
-            style={{ transformStyle: 'preserve-3d', transform: 'rotateX(60deg) rotateZ(-45deg) scale(1.05)' }}
-          >
-            <svg
-              className="absolute inset-0 w-full h-full"
-              viewBox="0 0 700 500"
-              role="img"
-              aria-label="3D isometric Kerala journey map with train, road and backwater routes"
-              style={{ transform: 'translateZ(0px)' }}
-            >
-              <defs>
-                <linearGradient id="oceanGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#1e3a8a" />
-                  <stop offset="100%" stopColor="#0f172a" />
-                </linearGradient>
-                <linearGradient id="landGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#059669" />
-                  <stop offset="50%" stopColor="#10b981" />
-                  <stop offset="100%" stopColor="#34d399" />
-                </linearGradient>
-              </defs>
+          <defs>
+            <linearGradient id="landGradient2d" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#0f766e" />
+              <stop offset="50%" stopColor="#10b981" />
+              <stop offset="100%" stopColor="#34d399" />
+            </linearGradient>
+            <linearGradient id="waterGradient2d" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#38bdf8" />
+              <stop offset="100%" stopColor="#2563eb" />
+            </linearGradient>
+            <linearGradient id="routeGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#f472b6" />
+              <stop offset="100%" stopColor="#a855f7" />
+            </linearGradient>
+          </defs>
 
-              <rect x="0" y="0" width="700" height="500" fill="url(#oceanGradient)" />
+          <path d={LAND_SHAPE} fill="url(#landGradient2d)" opacity="0.95" />
+          <path d={WATER_SHAPE} fill="url(#waterGradient2d)" opacity="0.9" />
 
-              <ellipse cx="350" cy="280" rx="280" ry="180" fill="url(#landGradient)" opacity="0.95" />
+          <g opacity="0.6" stroke="rgba(191,219,254,0.6)" fill="none">
+            <circle cx="560" cy="320" r="16">
+              <animate attributeName="r" values="12;18;12" dur="4s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.2;0.6;0.2" dur="4s" repeatCount="indefinite" />
+            </circle>
+            <circle cx="590" cy="350" r="10">
+              <animate attributeName="r" values="8;14;8" dur="3.5s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.2;0.6;0.2" dur="3.5s" repeatCount="indefinite" />
+            </circle>
+          </g>
 
-              <ellipse cx="500" cy="200" rx="120" ry="80" fill="#4ade80" opacity="0.8" />
-
-              <ellipse cx="480" cy="380" rx="90" ry="50" fill="#3b82f6" opacity="0.7">
-                <animate attributeName="opacity" values="0.5;0.8;0.5" dur="4s" repeatCount="indefinite" />
-              </ellipse>
-              <ellipse cx="440" cy="360" rx="30" ry="20" fill="#60a5fa" opacity="0.6" />
-              <ellipse cx="520" cy="400" rx="25" ry="15" fill="#60a5fa" opacity="0.6" />
-
-              <motion.path
-                d={PATHS.train}
-                stroke="#ec4899"
-                strokeWidth="3"
-                strokeDasharray="10 5"
-                fill="none"
-                strokeLinecap="round"
-                initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: 1, opacity: 0.9 }}
-                transition={{ duration: 2, delay: 0.5 }}
-              />
-
-              <motion.path
-                d={PATHS.roadToMunnar}
-                stroke="#6b7280"
-                strokeWidth="2.5"
-                fill="none"
-                strokeLinecap="round"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 2, delay: 1 }}
-              />
-
-              <motion.path
-                d={PATHS.roadToAlleppey}
-                stroke="#6b7280"
-                strokeWidth="2.5"
-                fill="none"
-                strokeLinecap="round"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 2, delay: 1.5 }}
-              />
-
-              <motion.path
-                d={PATHS.roadBackToKochi}
-                stroke="#6b7280"
-                strokeWidth="2.5"
-                fill="none"
-                strokeLinecap="round"
-                strokeDasharray="5 3"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 2, delay: 2 }}
-              />
-
-              <motion.path
-                d={PATHS.trainReturn}
-                stroke="#a78bfa"
-                strokeWidth="2"
-                strokeDasharray="8 4"
-                fill="none"
-                strokeLinecap="round"
-                opacity="0.6"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 2, delay: 2.5 }}
-              />
-
-              <text x="250" y="180" fill="white" fontSize="10" opacity="0.6">150 km</text>
-              <text x="450" y="290" fill="white" fontSize="10" opacity="0.6">160 km</text>
-
-              <path id="trainPath" d={PATHS.train} fill="none" />
-              <path id="carPath" d={PATHS.carLoop} fill="none" />
-              <path id="trainReturnPath" d={PATHS.trainReturn} fill="none" />
-            </svg>
-
-            <div
-              className="absolute bg-slate-600 rounded-sm"
-              style={{ left: '180px', top: '85px', width: '20px', height: '30px', transform: 'translateZ(15px)', boxShadow: '4px 4px 8px rgba(0,0,0,0.5)' }}
-            />
-            <div
-              className="absolute bg-slate-500 rounded-sm"
-              style={{ left: '205px', top: '95px', width: '18px', height: '25px', transform: 'translateZ(12px)', boxShadow: '4px 4px 8px rgba(0,0,0,0.5)' }}
-            />
-            <div
-              className="absolute bg-slate-500 rounded-sm"
-              style={{ left: '130px', top: '340px', width: '18px', height: '28px', transform: 'translateZ(14px)', boxShadow: '4px 4px 8px rgba(0,0,0,0.5)' }}
-            />
-            <div
-              className="absolute bg-slate-600 rounded-sm"
-              style={{ left: '152px', top: '348px', width: '16px', height: '22px', transform: 'translateZ(11px)', boxShadow: '4px 4px 8px rgba(0,0,0,0.5)' }}
-            />
-
-            <motion.div
-              className="absolute text-2xl"
-              style={{ left: '480px', top: '380px' }}
-              animate={{ y: [0, -3, 0], rotate: [-2, 2, -2] }}
-              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-            >
-              🛶
-            </motion.div>
-
-            <div className="seq-vehicle seq-train" style={{ offsetPath: `path('${PATHS.train}')` }}>🚆</div>
-            <div className="seq-vehicle seq-car" style={{ offsetPath: `path('${PATHS.carLoop}')` }}>🚗</div>
-            <div className="seq-vehicle seq-train-return" style={{ offsetPath: `path('${PATHS.trainReturn}')` }}>🚆</div>
-
-            {LOCATIONS.map((location, index) => (
-              <motion.div
-                key={location.id}
-                className="absolute cursor-pointer"
-                style={{
-                  left: `${location.x}px`,
-                  top: `${location.y}px`,
-                  transformStyle: 'preserve-3d',
-                  transform: 'translate3d(-50%, -50%, 20px)',
-                }}
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: index * 0.3 + 1, duration: 0.5 }}
-                whileHover={{ scale: 1.2 }}
-                onHoverStart={() => setHoveredLocation(location.id)}
-                onHoverEnd={() => setHoveredLocation(null)}
-              >
-                <motion.div
-                  className="absolute -inset-3 rounded-full border-2 opacity-50"
-                  style={{ borderColor: location.color }}
-                  animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0.8, 0.5] }}
-                  transition={{ duration: 2, repeat: Infinity, delay: index * 0.5 }}
-                />
-
-                <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center shadow-lg"
-                  style={{ backgroundColor: location.color, boxShadow: `0 0 20px ${location.color}80` }}
-                >
-                  <span className="text-lg">{location.emoji}</span>
-                </div>
-
-                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
-                  <div className="text-white text-xs md:text-sm font-bold">{location.name}</div>
-                </div>
-
-                {hoveredLocation === location.id && (
-                  <motion.div
-                    className="absolute -top-20 left-1/2 -translate-x-1/2 bg-slate-800/95 backdrop-blur-sm rounded-lg p-3 border border-slate-700 shadow-2xl z-50 min-w-[160px]"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    style={{ transform: 'translateZ(50px) translateX(-50%)' }}
-                  >
-                    <div className="text-white text-xs font-semibold mb-1">{location.name}</div>
-                    <div className="text-slate-300 text-xs mb-1">{location.date}</div>
-                    <div className="text-slate-400 text-xs">{location.description}</div>
-                  </motion.div>
-                )}
-              </motion.div>
-            ))}
-
-            {Array.from({ length: 4 }).map((_, index) => (
-              <motion.div
-                key={`palm-${index}`}
-                className="absolute text-2xl opacity-40"
-                style={{ left: `${440 + index * 20}px`, top: `${350 + (index % 2) * 15}px`, transform: 'translateZ(5px)' }}
-                animate={{ rotate: [-3, 3, -3] }}
-                transition={{ duration: 3 + index * 0.5, repeat: Infinity, ease: 'easeInOut' }}
-              >
-                🌴
-              </motion.div>
-            ))}
-
-            {Array.from({ length: 3 }).map((_, index) => (
-              <motion.div
-                key={`cloud-${index}`}
-                className="absolute text-3xl opacity-20"
-                style={{ left: `${460 + index * 30}px`, top: `${160 + index * 10}px`, transform: 'translateZ(30px)' }}
-                animate={{ x: [0, 10, 0], opacity: [0.1, 0.2, 0.1] }}
-                transition={{ duration: 8 + index * 2, repeat: Infinity, ease: 'easeInOut' }}
-              >
-                ☁️
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-      </div>
-
-      <motion.div
-        className="mt-6 flex flex-wrap justify-center gap-6 text-sm"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 3 }}
-      >
-        <div className="flex items-center gap-2">
-          <div
-            className="w-8 h-0.5 bg-pink-500 rounded"
-            style={{ backgroundImage: 'repeating-linear-gradient(to right, #ec4899 0, #ec4899 10px, transparent 10px, transparent 15px)' }}
+          <motion.path
+            d={PATHS.train}
+            stroke="url(#routeGlow)"
+            strokeWidth="4"
+            strokeDasharray="12 8"
+            fill="none"
+            strokeLinecap="round"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 0.9 }}
+            transition={{ duration: 1.8 }}
           />
-          <span className="text-slate-400">Train Journey</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-0.5 bg-gray-500 rounded" />
-          <span className="text-slate-400">Road Route</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded-full bg-amber-500" />
-          <span className="text-slate-400">Destinations</span>
-        </div>
-      </motion.div>
+          <motion.path
+            d={PATHS.road}
+            stroke="#64748b"
+            strokeWidth="3"
+            fill="none"
+            strokeLinecap="round"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 0.9 }}
+            transition={{ duration: 2, delay: 0.2 }}
+          />
+          <motion.path
+            d={PATHS.trainReturn}
+            stroke="#f59e0b"
+            strokeWidth="2.5"
+            strokeDasharray="6 6"
+            fill="none"
+            strokeLinecap="round"
+            opacity="0.7"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 0.7 }}
+            transition={{ duration: 1.8, delay: 0.6 }}
+          />
+
+          <text x="250" y="210" fill="white" fontSize="12" opacity="0.55">150 km</text>
+          <text x="470" y="260" fill="white" fontSize="12" opacity="0.55">160 km</text>
+
+          {LOCATIONS.map((location) => (
+            <g key={location.id}>
+              <circle cx={location.x} cy={location.y} r="10" fill={location.color} opacity="0.85" />
+              <circle cx={location.x} cy={location.y} r="16" stroke={location.color} strokeWidth="2" fill="none" opacity="0.4">
+                <animate attributeName="r" values="12;18;12" dur="2.2s" repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0.2;0.6;0.2" dur="2.2s" repeatCount="indefinite" />
+              </circle>
+              <text x={location.x + 14} y={location.y + 4} fill="white" fontSize="12" fontWeight="600">{location.name}</text>
+            </g>
+          ))}
+
+          <g>
+            <text fontSize="20">🚆
+              <animateMotion dur="10s" repeatCount="indefinite" rotate="auto">
+                <mpath href="#trainPath2d" />
+              </animateMotion>
+            </text>
+            <path id="trainPath2d" d={PATHS.train} fill="none" />
+          </g>
+          <g>
+            <text fontSize="18">🚗
+              <animateMotion dur="12s" repeatCount="indefinite" rotate="auto">
+                <mpath href="#roadPath2d" />
+              </animateMotion>
+            </text>
+            <path id="roadPath2d" d={PATHS.road} fill="none" />
+          </g>
+          <g>
+            <text x="540" y="330" fontSize="18">🛶
+              <animateTransform attributeName="transform" type="translate" values="0 0; 0 -4; 0 0" dur="3s" repeatCount="indefinite" />
+            </text>
+          </g>
+        </motion.svg>
+      </div>
     </div>
   )
 }
