@@ -2645,6 +2645,82 @@ nav {
   color: #cbd5e1;
 }
 
+.map-route {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+.map-route.train {
+  stroke: url(#routeGlow);
+  stroke-width: 4;
+  stroke-dasharray: 12 8;
+}
+
+.map-route.road {
+  stroke: #64748b;
+  stroke-width: 3;
+}
+
+.map-route.return {
+  stroke: #f59e0b;
+  stroke-width: 2.5;
+  stroke-dasharray: 6 6;
+  opacity: 0.7;
+}
+
+.map-route.draw-train {
+  animation: drawRouteTrain 4s linear forwards;
+}
+
+.map-route.draw-road {
+  animation: drawRouteRoad 5s linear forwards;
+}
+
+.map-route.draw-return {
+  animation: drawRouteReturn 4s linear forwards;
+}
+
+.map-route.route-complete {
+  opacity: 0.35;
+}
+
+.map-marker.active circle:last-of-type {
+  animation: markerPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes drawRouteTrain {
+  from {
+    stroke-dashoffset: 1;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes drawRouteRoad {
+  from {
+    stroke-dashoffset: 1;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes drawRouteReturn {
+  from {
+    stroke-dashoffset: 1;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
 .seq-vehicle {
   position: absolute;
   top: 0;
