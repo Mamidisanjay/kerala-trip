@@ -29,7 +29,12 @@ function JourneyMap({ progress = 0 }) {
   const activeStop = getActiveStop(safeProgress)
 
   return (
-    <div className="journey-map-fullbleed">
+    <div className="journey-map-card glass-card">
+      <div className="journey-map-card-head">
+        <div className="badge" style={{ marginBottom: 8 }}>🗺️ Route Map</div>
+        <p className="journey-map-card-copy">Forward and return route from Vijayawada to Kerala.</p>
+      </div>
+
       <div className="journey-map-stack">
         <img src={INDIA_MAP_IMAGE} alt="Map of India" className="journey-map-image" loading="lazy" />
         <svg

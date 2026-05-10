@@ -105,6 +105,13 @@ function CarouselSection() {
   const onPointerUp = (event) => {
     draggingRef.current = false
     if (stageRef.current) stageRef.current.releasePointerCapture(event.pointerId)
+
+    if (stepDeg > 0) {
+      rotationRef.current = Math.round(rotationRef.current / stepDeg) * stepDeg
+      if (ringRef.current) {
+        ringRef.current.style.transform = `rotateX(0deg) rotateY(${rotationRef.current}deg)`
+      }
+    }
   }
 
   const rotateByStep = (direction) => {
