@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const LOCATIONS = [
@@ -111,6 +111,8 @@ const PATHS = {
   },
 }
 
+const CAR_PATH = 'M 140,380 Q 280,240 520,180 Q 540,280 500,410'
+
 const STAR_FIELD = (() => {
   let seed = 1337
   const next = () => {
@@ -127,67 +129,71 @@ const STAR_FIELD = (() => {
 
 function JourneyMap() {
   const [activeLocation, setActiveLocation] = useState(null)
+  const [journeyPhase, setJourneyPhase] = useState('train')
+  const [pulseStop, setPulseStop] = useState(null)
+
+  useEffect(() => {
+    let timers = []
+
+    if (journeyPhase === 'train') {
+      timers.push(setTimeout(() => setPulseStop(null), 0))
+      timers.push(setTimeout(() => setPulseStop('kochi'), 3600))
+      timers.push(setTimeout(() => setJourneyPhase('car'), 4000))
+    }
+
+    if (journeyPhase === 'car') {
+      timers.push(setTimeout(() => setPulseStop(null), 0))
+      timers.push(setTimeout(() => setPulseStop('munnar'), 2200))
+      timers.push(setTimeout(() => setPulseStop('alleppey'), 4200))
+      timers.push(setTimeout(() => setJourneyPhase('return'), 5000))
+    }
+
+    if (journeyPhase === 'return') {
+      timers.push(setTimeout(() => setPulseStop(null), 0))
+      timers.push(setTimeout(() => setPulseStop('vijayawada'), 3600))
+      timers.push(setTimeout(() => setJourneyPhase('train'), 4600))
+    }
+
+    return () => {
+      timers.forEach((timer) => clearTimeout(timer))
+    }
+  }, [journeyPhase])
 
   return (
-    <div className="relative w-full min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-950 overflow-hidden">
-      <div className="absolute inset-0 overflow-hidden">
-        {STAR_FIELD.map((star, index) => (
-          <motion.div
-            key={index}
-            className="absolute w-1 h-1 bg-white rounded-full"
-            style={{
-              left: `${star.left}%`,
-              top: `${star.top}%`,
-            }}
-            animate={{ opacity: [0, 1, 0], scale: [0, 1.5, 0] }}
-            transition={{
-              duration: star.duration,
-              repeat: Infinity,
-              delay: star.delay,
-            }}
-          />
-        ))}
+    <div className="journey-iso-card glass-card">
+      <div className="journey-iso-top">
+        <div className="badge" style={{ marginBottom: 8 }}>🗺️ Kerala Journey</div>
+        <p className="journey-iso-copy">Tata Express to Kochi, then road trip through Munnar and Alleppey.</p>
       </div>
 
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-600/20 rounded-full blur-3xl animate-pulse delay-1000" />
+      <motion.div
+        className="relative w-full h-[640px] md:h-[720px] overflow-hidden rounded-3xl"
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1, delay: 0.2 }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-950" />
+        <div className="absolute inset-0 overflow-hidden">
+          {STAR_FIELD.map((star, index) => (
+            <motion.div
+              key={index}
+              className="absolute w-1 h-1 bg-white rounded-full"
+              style={{
+                left: `${star.left}%`,
+                top: `${star.top}%`,
+              }}
+              animate={{ opacity: [0, 1, 0], scale: [0, 1.5, 0] }}
+              transition={{
+                duration: star.duration,
+                repeat: Infinity,
+                delay: star.delay,
+              }}
+            />
+          ))}
+        </div>
 
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 py-8 md:py-12">
-        <motion.div
-          className="text-center mb-12"
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          <motion.div
-            className="inline-block mb-4"
-            animate={{ rotate: [0, 10, -10, 0] }}
-            transition={{ duration: 4, repeat: Infinity }}
-          >
-            <span className="text-7xl md:text-8xl drop-shadow-2xl">🌴</span>
-          </motion.div>
-
-          <h1 className="text-5xl md:text-7xl font-black bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent mb-4 drop-shadow-2xl">
-            Kerala Journey
-          </h1>
-
-          <p className="text-xl md:text-2xl text-slate-300 font-light mb-2">
-            Vijayawada → Kochi → Munnar → Alleppey → Vijayawada
-          </p>
-
-          <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full">
-            <span className="text-2xl">📅</span>
-            <span className="text-slate-300 font-medium">May 22 - 26, 2026</span>
-          </div>
-        </motion.div>
-
-        <motion.div
-          className="relative w-full h-[700px] md:h-[800px] mb-12"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, delay: 0.3 }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-2xl rounded-3xl border border-white/10 shadow-2xl" />
+        <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-purple-600/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-cyan-600/20 rounded-full blur-3xl animate-pulse delay-1000" />
 
           <div
             className="absolute inset-0 flex items-center justify-center overflow-hidden rounded-3xl"
@@ -264,46 +270,75 @@ function JourneyMap() {
                   ))}
                 </g>
 
-                <motion.path
-                  d={PATHS.train.d}
-                  stroke="url(#trainGradient)"
-                  strokeWidth="4"
-                  strokeDasharray={PATHS.train.dashArray}
-                  fill="none"
-                  strokeLinecap="round"
-                  filter="url(#glow)"
-                  initial={{ pathLength: 0, opacity: 0 }}
-                  animate={{ pathLength: 1, opacity: 1 }}
-                  transition={{ duration: 2.5, delay: 0.8, ease: 'easeInOut' }}
-                />
-
-                {[PATHS.road1, PATHS.road2, PATHS.road3].map((path, index) => (
+                {journeyPhase === 'train' ? (
                   <motion.path
-                    key={index}
-                    d={path.d}
-                    stroke="#94a3b8"
-                    strokeWidth="3"
-                    strokeDasharray={path.dashArray}
+                    d={PATHS.train.d}
+                    stroke="url(#trainGradient)"
+                    strokeWidth="4"
+                    strokeDasharray={PATHS.train.dashArray}
                     fill="none"
                     strokeLinecap="round"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ duration: 2, delay: 1.5 + index * 0.5 }}
+                    filter="url(#glow)"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: 1, opacity: 1 }}
+                    transition={{ duration: 4, ease: 'linear' }}
                   />
-                ))}
+                ) : (
+                  <path
+                    d={PATHS.train.d}
+                    stroke="url(#trainGradient)"
+                    strokeWidth="4"
+                    strokeDasharray={PATHS.train.dashArray}
+                    fill="none"
+                    strokeLinecap="round"
+                    opacity="0.35"
+                  />
+                )}
 
-                <motion.path
-                  d={PATHS.trainReturn.d}
-                  stroke="#a78bfa"
-                  strokeWidth="3"
-                  strokeDasharray={PATHS.trainReturn.dashArray}
-                  fill="none"
-                  strokeLinecap="round"
-                  opacity="0.5"
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{ duration: 2, delay: 3.5 }}
-                />
+                {journeyPhase === 'car' ? (
+                  [PATHS.road1, PATHS.road2, PATHS.road3].map((path, index) => (
+                    <motion.path
+                      key={`road-anim-${index}`}
+                      d={path.d}
+                      stroke="#94a3b8"
+                      strokeWidth="3"
+                      strokeDasharray={path.dashArray}
+                      fill="none"
+                      strokeLinecap="round"
+                      initial={{ pathLength: 0, opacity: 0.2 }}
+                      animate={{ pathLength: 1, opacity: 1 }}
+                      transition={{ duration: 5, ease: 'linear' }}
+                    />
+                  ))
+                ) : (
+                  [PATHS.road1, PATHS.road2, PATHS.road3].map((path, index) => (
+                    <path
+                      key={`road-static-${index}`}
+                      d={path.d}
+                      stroke="#94a3b8"
+                      strokeWidth="3"
+                      strokeDasharray={path.dashArray}
+                      fill="none"
+                      strokeLinecap="round"
+                      opacity="0.3"
+                    />
+                  ))
+                )}
+
+                {journeyPhase === 'return' ? (
+                  <motion.path
+                    d={PATHS.trainReturn.d}
+                    stroke="#a78bfa"
+                    strokeWidth="3"
+                    strokeDasharray={PATHS.trainReturn.dashArray}
+                    fill="none"
+                    strokeLinecap="round"
+                    opacity="0.7"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: 1, opacity: 0.8 }}
+                    transition={{ duration: 4, ease: 'linear' }}
+                  />
+                ) : null}
 
                 <motion.text
                   x="300"
@@ -331,6 +366,10 @@ function JourneyMap() {
                 >
                   160 km
                 </motion.text>
+
+                <text x="210" y="235" fill="white" fontSize="12" fontWeight="700" opacity="0.7">
+                  Tata Express
+                </text>
 
                 <defs>
                   <linearGradient id="oceanGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -418,30 +457,53 @@ function JourneyMap() {
                 />
               ))}
 
-              <motion.div
-                className="absolute text-4xl filter drop-shadow-2xl"
-                animate={{ offsetDistance: ['0%', '100%'] }}
-                transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
-                style={{ offsetPath: `path("${PATHS.train.d}")`, offsetRotate: '0deg' }}
-              >
-                🚆
-              </motion.div>
+              {journeyPhase === 'train' && (
+                <motion.div
+                  key="train-phase"
+                  className="absolute text-4xl filter drop-shadow-2xl"
+                  animate={{ offsetDistance: ['0%', '100%'] }}
+                  transition={{ duration: 4, ease: 'linear' }}
+                  style={{
+                    offsetPath: `path("${PATHS.train.d}")`,
+                    offsetRotate: 'auto',
+                    transform: 'translate(-50%, -50%)',
+                  }}
+                >
+                  🚆
+                </motion.div>
+              )}
 
-              <motion.div
-                className="absolute text-3xl filter drop-shadow-xl"
-                animate={{
-                  x: [140, 280, 520, 540, 500, 340, 140],
-                  y: [380, 280, 180, 250, 410, 420, 380],
-                }}
-                transition={{
-                  duration: 20,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                  times: [0, 0.2, 0.4, 0.55, 0.7, 0.85, 1],
-                }}
-              >
-                🚗
-              </motion.div>
+              {journeyPhase === 'car' && (
+                <motion.div
+                  key="car-phase"
+                  className="absolute text-3xl filter drop-shadow-xl"
+                  animate={{ offsetDistance: ['0%', '100%'] }}
+                  transition={{ duration: 5, ease: 'linear' }}
+                  style={{
+                    offsetPath: `path("${CAR_PATH}")`,
+                    offsetRotate: 'auto',
+                    transform: 'translate(-50%, -50%)',
+                  }}
+                >
+                  🚗
+                </motion.div>
+              )}
+
+              {journeyPhase === 'return' && (
+                <motion.div
+                  key="return-phase"
+                  className="absolute text-4xl filter drop-shadow-2xl"
+                  animate={{ offsetDistance: ['0%', '100%'] }}
+                  transition={{ duration: 4, ease: 'linear' }}
+                  style={{
+                    offsetPath: `path("${PATHS.trainReturn.d}")`,
+                    offsetRotate: 'auto',
+                    transform: 'translate(-50%, -50%)',
+                  }}
+                >
+                  🚆
+                </motion.div>
+              )}
 
               <motion.div
                 className="absolute text-3xl filter drop-shadow-xl"
@@ -473,8 +535,8 @@ function JourneyMap() {
                       key={ring}
                       className="absolute -inset-4 rounded-full border-2"
                       style={{ borderColor: location.glow, boxShadow: `0 0 20px ${location.glow}` }}
-                      animate={{ scale: [1, 1.5 + ring * 0.3, 1], opacity: [0.6, 0, 0.6] }}
-                      transition={{ duration: 3, repeat: Infinity, delay: ring * 0.5 + index * 0.2 }}
+                      animate={pulseStop === location.id ? { scale: [1, 1.5 + ring * 0.3, 1], opacity: [0.6, 0, 0.6] } : { opacity: 0 }}
+                      transition={{ duration: 2.2, repeat: pulseStop === location.id ? Infinity : 0, delay: ring * 0.3 }}
                     />
                   ))}
 
@@ -610,54 +672,6 @@ function JourneyMap() {
             </div>
           </div>
         </motion.div>
-
-        <motion.div
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1, duration: 0.8 }}
-        >
-          {[
-            { icon: '🚆', label: 'Train Distance', value: '1,350 km', color: 'purple' },
-            { icon: '🚗', label: 'Road Distance', value: '385 km', color: 'cyan' },
-            { icon: '📍', label: 'Destinations', value: '4 Cities', color: 'green' },
-            { icon: '📅', label: 'Duration', value: '5 Days', color: 'pink' },
-          ].map((stat) => (
-            <motion.div
-              key={stat.label}
-              className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 text-center"
-              whileHover={{ scale: 1.05, y: -5 }}
-              transition={{ type: 'spring', stiffness: 300 }}
-            >
-              <div className="text-4xl mb-2">{stat.icon}</div>
-              <div className={`text-3xl font-bold bg-gradient-to-r from-${stat.color}-400 to-${stat.color}-600 bg-clip-text text-transparent mb-1`}>
-                {stat.value}
-              </div>
-              <div className="text-sm text-slate-400">{stat.label}</div>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        <motion.div
-          className="flex flex-wrap justify-center gap-6 text-sm"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5 }}
-        >
-          <div className="flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full">
-            <div className="w-10 h-1 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500" />
-            <span className="text-slate-300">Train Journey</span>
-          </div>
-          <div className="flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full">
-            <div className="w-10 h-1 rounded-full bg-slate-500" />
-            <span className="text-slate-300">Road Route</span>
-          </div>
-          <div className="flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full">
-            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-purple-500 to-purple-700" />
-            <span className="text-slate-300">Major Stops</span>
-          </div>
-        </motion.div>
-      </div>
     </div>
   )
 }
