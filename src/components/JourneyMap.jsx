@@ -1,180 +1,662 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 const LOCATIONS = [
-  { id: 'vijayawada', name: 'Vijayawada', emoji: '🏠', x: 130, y: 110, color: '#f59e0b' },
-  { id: 'kochi', name: 'Kochi', emoji: '🌆', x: 140, y: 360, color: '#f59e0b' },
-  { id: 'munnar', name: 'Munnar', emoji: '⛰️', x: 480, y: 170, color: '#f59e0b' },
-  { id: 'alleppey', name: 'Alleppey', emoji: '🛶', x: 520, y: 330, color: '#f59e0b' },
+  {
+    id: 'vijayawada',
+    name: 'Vijayawada',
+    subtitle: 'Home Sweet Home',
+    emoji: '🏠',
+    icon: '🏛️',
+    x: 180,
+    y: 120,
+    z: 30,
+    color: '#8b5cf6',
+    glow: '#c084fc',
+    date: 'May 22, 2026',
+    time: '03:50 AM',
+    activities: ['Departure', 'Board Kochi Express'],
+    mood: 'excitement',
+  },
+  {
+    id: 'kochi',
+    name: 'Kochi',
+    subtitle: 'Queen of Arabian Sea',
+    emoji: '🌊',
+    icon: '⛴️',
+    x: 140,
+    y: 380,
+    z: 15,
+    color: '#06b6d4',
+    glow: '#22d3ee',
+    date: 'May 23, 2026',
+    time: '02:00 AM',
+    activities: ['Arrival', 'Fort Kochi', 'Chinese Nets', 'Marine Drive'],
+    mood: 'wonder',
+  },
+  {
+    id: 'munnar',
+    name: 'Munnar',
+    subtitle: 'Kashmir of South India',
+    emoji: '⛰️',
+    icon: '🍃',
+    x: 520,
+    y: 180,
+    z: 60,
+    color: '#10b981',
+    glow: '#34d399',
+    date: 'May 23-24',
+    time: 'Full Day',
+    activities: ['Tea Museum', 'Echo Point', 'Mattupetty Dam', 'National Park'],
+    mood: 'tranquil',
+  },
+  {
+    id: 'alleppey',
+    name: 'Alleppey',
+    subtitle: 'Venice of the East',
+    emoji: '🛶',
+    icon: '🌴',
+    x: 500,
+    y: 410,
+    z: 5,
+    color: '#3b82f6',
+    glow: '#60a5fa',
+    date: 'May 25, 2026',
+    time: 'Houseboat Stay',
+    activities: ['Backwater Cruise', 'Village Tour', 'Sunset Views', 'Kerala Cuisine'],
+    mood: 'bliss',
+  },
 ]
 
 const PATHS = {
-  train: 'M 130,110 Q 110,220 140,360',
-  road: 'M 140,360 Q 300,260 480,170 Q 530,240 520,330',
-  trainReturn: 'M 140,360 Q 110,220 130,110',
+  train: {
+    d: 'M 180,120 Q 120,220 140,380',
+    length: 1350,
+    duration: '22h 10m',
+    mode: '🚆',
+    color: '#a855f7',
+    dashArray: '15 8',
+  },
+  road1: {
+    d: 'M 140,380 Q 280,240 520,180',
+    length: 150,
+    duration: '4h',
+    mode: '🚗',
+    color: '#64748b',
+    dashArray: 'none',
+  },
+  road2: {
+    d: 'M 520,180 Q 540,280 500,410',
+    length: 160,
+    duration: '4h',
+    mode: '🚗',
+    color: '#64748b',
+    dashArray: 'none',
+  },
+  road3: {
+    d: 'M 500,410 Q 340,420 140,380',
+    length: 75,
+    duration: '2h',
+    mode: '🚗',
+    color: '#64748b',
+    dashArray: '8 4',
+  },
+  trainReturn: {
+    d: 'M 140,380 Q 120,220 180,120',
+    length: 1350,
+    duration: '22h',
+    mode: '🚆',
+    color: '#7c3aed',
+    dashArray: '12 6',
+  },
 }
 
-const LAND_SHAPE = 'M120 70 C210 40 380 40 520 90 C640 130 680 220 650 320 C620 430 470 470 300 450 C160 430 90 340 90 230 C90 150 100 90 120 70 Z'
-const WATER_SHAPE = 'M460 260 C520 230 610 240 640 290 C670 340 650 400 580 410 C520 420 470 380 450 330 C440 300 445 275 460 260 Z'
-const MAP_WIDTH = 700
-const MAP_HEIGHT = 500
-
-const STEP_DURATIONS = {
-  trainOut: 4000,
-  road: 5000,
-  trainBack: 4000,
-}
+const STAR_FIELD = (() => {
+  let seed = 1337
+  const next = () => {
+    seed = (seed * 9301 + 49297) % 233280
+    return seed / 233280
+  }
+  return Array.from({ length: 100 }).map(() => ({
+    left: next() * 100,
+    top: next() * 100,
+    duration: 2 + next() * 3,
+    delay: next() * 5,
+  }))
+})()
 
 function JourneyMap() {
-  const [step, setStep] = useState(1)
-  const [activePulse, setActivePulse] = useState(null)
-
-  const toPercentX = (value) => `${(value / MAP_WIDTH) * 100}%`
-  const toPercentY = (value) => `${(value / MAP_HEIGHT) * 100}%`
-
-  useEffect(() => {
-    let timers = []
-
-    if (step === 1) {
-      timers.push(setTimeout(() => setActivePulse(null), 0))
-      timers.push(setTimeout(() => setActivePulse('kochi'), STEP_DURATIONS.trainOut - 400))
-      timers.push(setTimeout(() => setStep(2), STEP_DURATIONS.trainOut))
-    }
-
-    if (step === 2) {
-      timers.push(setTimeout(() => setActivePulse(null), 0))
-      timers.push(setTimeout(() => setActivePulse('munnar'), 2200))
-      timers.push(setTimeout(() => setActivePulse('alleppey'), 4200))
-      timers.push(setTimeout(() => setStep(3), STEP_DURATIONS.road))
-    }
-
-    if (step === 3) {
-      timers.push(setTimeout(() => setActivePulse(null), 0))
-      timers.push(setTimeout(() => setActivePulse('vijayawada'), STEP_DURATIONS.trainBack - 400))
-      timers.push(setTimeout(() => setStep(1), STEP_DURATIONS.trainBack + 600))
-    }
-
-    return () => {
-      timers.forEach((timer) => clearTimeout(timer))
-    }
-  }, [step])
+  const [activeLocation, setActiveLocation] = useState(null)
 
   return (
-    <div className="journey-iso-card glass-card">
-      <div className="journey-iso-top">
-        <div className="badge" style={{ marginBottom: 8 }}>🗺️ Kerala Journey Map</div>
-        <p className="journey-iso-copy">Flat 2D animated route from Vijayawada to Kerala highlights. May 22-26, 2026.</p>
+    <div className="relative w-full min-h-screen bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-950 overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden">
+        {STAR_FIELD.map((star, index) => (
+          <motion.div
+            key={index}
+            className="absolute w-1 h-1 bg-white rounded-full"
+            style={{
+              left: `${star.left}%`,
+              top: `${star.top}%`,
+            }}
+            animate={{ opacity: [0, 1, 0], scale: [0, 1.5, 0] }}
+            transition={{
+              duration: star.duration,
+              repeat: Infinity,
+              delay: star.delay,
+            }}
+          />
+        ))}
       </div>
 
-      <div className="relative w-full h-[520px] md:h-[600px] overflow-hidden rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(56,189,248,0.18),transparent_45%),radial-gradient(circle_at_80%_70%,rgba(16,185,129,0.15),transparent_45%)]" />
-          <div className="absolute inset-0 flex items-center justify-center text-5xl md:text-7xl font-semibold text-white/5 tracking-[0.45em]">JOURNEY</div>
-        </div>
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-600/20 rounded-full blur-3xl animate-pulse delay-1000" />
 
-        <svg
-          className="absolute inset-0 w-full h-full"
-          viewBox="0 0 700 500"
-          role="img"
-          aria-label="2D journey map with train, road and backwater routes"
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 py-8 md:py-12">
+        <motion.div
+          className="text-center mb-12"
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
         >
-          <defs>
-            <linearGradient id="landGradient2d" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#0f766e" />
-              <stop offset="50%" stopColor="#10b981" />
-              <stop offset="100%" stopColor="#34d399" />
-            </linearGradient>
-            <linearGradient id="waterGradient2d" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#38bdf8" />
-              <stop offset="100%" stopColor="#2563eb" />
-            </linearGradient>
-            <linearGradient id="routeGlow" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#f472b6" />
-              <stop offset="100%" stopColor="#a855f7" />
-            </linearGradient>
-          </defs>
-
-          <path d={LAND_SHAPE} fill="url(#landGradient2d)" opacity="0.95" />
-          <path d={WATER_SHAPE} fill="url(#waterGradient2d)" opacity="0.9" />
-
-          <g opacity="0.6" stroke="rgba(191,219,254,0.6)" fill="none">
-            <circle cx="560" cy="320" r="16">
-              <animate attributeName="r" values="12;18;12" dur="4s" repeatCount="indefinite" />
-              <animate attributeName="opacity" values="0.2;0.6;0.2" dur="4s" repeatCount="indefinite" />
-            </circle>
-            <circle cx="590" cy="350" r="10">
-              <animate attributeName="r" values="8;14;8" dur="3.5s" repeatCount="indefinite" />
-              <animate attributeName="opacity" values="0.2;0.6;0.2" dur="3.5s" repeatCount="indefinite" />
-            </circle>
-          </g>
-
-          <path d={PATHS.train} className="map-route-base train" />
-          <path
-            d={PATHS.train}
-            pathLength="100"
-            className={`map-route-anim train ${step === 1 ? 'is-active' : ''} ${step > 1 ? 'is-complete' : ''}`}
-          />
-
-          <path d={PATHS.road} className="map-route-base road" />
-          <path
-            d={PATHS.road}
-            pathLength="100"
-            className={`map-route-anim road ${step === 2 ? 'is-active' : ''} ${step > 2 ? 'is-complete' : ''}`}
-          />
-
-          <path d={PATHS.trainReturn} className="map-route-base return" />
-          <path
-            d={PATHS.trainReturn}
-            pathLength="100"
-            className={`map-route-anim return ${step === 3 ? 'is-active' : ''}`}
-          />
-
-          <text x="250" y="210" fill="white" fontSize="12" opacity="0.55">150 km</text>
-          <text x="470" y="260" fill="white" fontSize="12" opacity="0.55">160 km</text>
-
-          {LOCATIONS.map((location) => (
-            <g key={location.id} className={`map-marker ${activePulse === location.id ? 'active' : ''}`}>
-              <circle className="marker-core" cx={location.x} cy={location.y} r="10" fill={location.color} opacity="0.85" />
-              <circle className="marker-ring" cx={location.x} cy={location.y} r="16" stroke={location.color} strokeWidth="2" fill="none" opacity="0.4" />
-              <text x={location.x + 14} y={location.y + 4} fill="white" fontSize="12" fontWeight="600">{location.name}</text>
-            </g>
-          ))}
-        </svg>
-
-        <div className="map-vehicle-layer">
-          {step === 1 && (
-            <div
-              key={`train-${step}`}
-              className="map-vehicle train"
-              style={{ '--path': `path('${PATHS.train}')` }}
-            >
-              🚆
-            </div>
-          )}
-          {step === 2 && (
-            <div
-              key={`car-${step}`}
-              className="map-vehicle car"
-              style={{ '--path': `path('${PATHS.road}')` }}
-            >
-              🚗
-            </div>
-          )}
-          {step === 3 && (
-            <div
-              key={`train-return-${step}`}
-              className="map-vehicle train return"
-              style={{ '--path': `path('${PATHS.trainReturn}')` }}
-            >
-              🚆
-            </div>
-          )}
-          <div
-            className="map-vehicle boat"
-            style={{ left: toPercentX(540), top: toPercentY(330) }}
+          <motion.div
+            className="inline-block mb-4"
+            animate={{ rotate: [0, 10, -10, 0] }}
+            transition={{ duration: 4, repeat: Infinity }}
           >
-            🛶
+            <span className="text-7xl md:text-8xl drop-shadow-2xl">🌴</span>
+          </motion.div>
+
+          <h1 className="text-5xl md:text-7xl font-black bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent mb-4 drop-shadow-2xl">
+            Kerala Journey
+          </h1>
+
+          <p className="text-xl md:text-2xl text-slate-300 font-light mb-2">
+            Vijayawada → Kochi → Munnar → Alleppey → Vijayawada
+          </p>
+
+          <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full">
+            <span className="text-2xl">📅</span>
+            <span className="text-slate-300 font-medium">May 22 - 26, 2026</span>
           </div>
-        </div>
+        </motion.div>
+
+        <motion.div
+          className="relative w-full h-[700px] md:h-[800px] mb-12"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1, delay: 0.3 }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-2xl rounded-3xl border border-white/10 shadow-2xl" />
+
+          <div
+            className="absolute inset-0 flex items-center justify-center overflow-hidden rounded-3xl"
+            style={{ perspective: '2000px', perspectiveOrigin: 'center center' }}
+          >
+            <div
+              className="relative w-full h-full max-w-5xl"
+              style={{ transformStyle: 'preserve-3d', transform: 'rotateX(55deg) rotateZ(-42deg) scale(1.15)' }}
+            >
+              <svg
+                className="absolute inset-0 w-full h-full"
+                viewBox="0 0 700 550"
+                style={{ transform: 'translateZ(0px)' }}
+              >
+                <rect
+                  x="0"
+                  y="0"
+                  width="700"
+                  height="550"
+                  fill="url(#oceanGradient)"
+                  opacity="0.95"
+                />
+
+                <motion.ellipse
+                  cx="350"
+                  cy="300"
+                  rx="300"
+                  ry="200"
+                  fill="url(#landGradient)"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 1.5, ease: 'easeOut' }}
+                />
+
+                <motion.ellipse
+                  cx="520"
+                  cy="180"
+                  rx="140"
+                  ry="90"
+                  fill="url(#mountainGradient)"
+                  opacity="0.9"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 1.5, delay: 0.3 }}
+                >
+                  <animate attributeName="ry" values="90;95;90" dur="5s" repeatCount="indefinite" />
+                </motion.ellipse>
+
+                {Array.from({ length: 12 }).map((_, index) => (
+                  <rect
+                    key={`tea-${index}`}
+                    x={480 + (index % 4) * 20}
+                    y={160 + Math.floor(index / 4) * 15}
+                    width="15"
+                    height="10"
+                    fill="#22c55e"
+                    opacity="0.4"
+                    rx="2"
+                  />
+                ))}
+
+                <g opacity="0.8">
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <motion.ellipse
+                      key={`water-${index}`}
+                      cx={460 + index * 25}
+                      cy={390 + (index % 2) * 20}
+                      rx={30 + index * 5}
+                      ry={20}
+                      fill="url(#waterGradient)"
+                      animate={{ opacity: [0.6, 0.9, 0.6] }}
+                      transition={{ duration: 3 + index * 0.5, repeat: Infinity, delay: index * 0.3 }}
+                    />
+                  ))}
+                </g>
+
+                <motion.path
+                  d={PATHS.train.d}
+                  stroke="url(#trainGradient)"
+                  strokeWidth="4"
+                  strokeDasharray={PATHS.train.dashArray}
+                  fill="none"
+                  strokeLinecap="round"
+                  filter="url(#glow)"
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ pathLength: 1, opacity: 1 }}
+                  transition={{ duration: 2.5, delay: 0.8, ease: 'easeInOut' }}
+                />
+
+                {[PATHS.road1, PATHS.road2, PATHS.road3].map((path, index) => (
+                  <motion.path
+                    key={index}
+                    d={path.d}
+                    stroke="#94a3b8"
+                    strokeWidth="3"
+                    strokeDasharray={path.dashArray}
+                    fill="none"
+                    strokeLinecap="round"
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: 2, delay: 1.5 + index * 0.5 }}
+                  />
+                ))}
+
+                <motion.path
+                  d={PATHS.trainReturn.d}
+                  stroke="#a78bfa"
+                  strokeWidth="3"
+                  strokeDasharray={PATHS.trainReturn.dashArray}
+                  fill="none"
+                  strokeLinecap="round"
+                  opacity="0.5"
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ duration: 2, delay: 3.5 }}
+                />
+
+                <motion.text
+                  x="300"
+                  y="260"
+                  fill="white"
+                  fontSize="11"
+                  fontWeight="bold"
+                  opacity="0.7"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 0.7 }}
+                  transition={{ delay: 2 }}
+                >
+                  150 km
+                </motion.text>
+                <motion.text
+                  x="510"
+                  y="300"
+                  fill="white"
+                  fontSize="11"
+                  fontWeight="bold"
+                  opacity="0.7"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 0.7 }}
+                  transition={{ delay: 2.5 }}
+                >
+                  160 km
+                </motion.text>
+
+                <defs>
+                  <linearGradient id="oceanGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#1e3a8a" />
+                    <stop offset="50%" stopColor="#1e40af" />
+                    <stop offset="100%" stopColor="#0f172a" />
+                  </linearGradient>
+
+                  <linearGradient id="landGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#065f46" />
+                    <stop offset="30%" stopColor="#059669" />
+                    <stop offset="70%" stopColor="#10b981" />
+                    <stop offset="100%" stopColor="#34d399" />
+                  </linearGradient>
+
+                  <linearGradient id="mountainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#15803d" />
+                    <stop offset="50%" stopColor="#22c55e" />
+                    <stop offset="100%" stopColor="#4ade80" />
+                  </linearGradient>
+
+                  <linearGradient id="waterGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#0ea5e9" />
+                    <stop offset="50%" stopColor="#3b82f6" />
+                    <stop offset="100%" stopColor="#60a5fa" />
+                  </linearGradient>
+
+                  <linearGradient id="trainGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#a855f7" />
+                    <stop offset="50%" stopColor="#ec4899" />
+                    <stop offset="100%" stopColor="#f43f5e" />
+                  </linearGradient>
+
+                  <filter id="glow">
+                    <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                    <feMerge>
+                      <feMergeNode in="coloredBlur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                </defs>
+              </svg>
+
+              {[
+                { x: 160, y: 105, w: 22, h: 35, z: 18 },
+                { x: 185, y: 115, w: 20, h: 28, z: 14 },
+                { x: 200, y: 125, w: 18, h: 25, z: 12 },
+              ].map((building, index) => (
+                <motion.div
+                  key={`vja-${index}`}
+                  className="absolute bg-gradient-to-br from-slate-600 to-slate-700 rounded-sm"
+                  style={{
+                    left: `${building.x}px`,
+                    top: `${building.y}px`,
+                    width: `${building.w}px`,
+                    height: `${building.h}px`,
+                    transform: `translateZ(${building.z}px)`,
+                    boxShadow: '6px 6px 15px rgba(0,0,0,0.6)',
+                  }}
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 1 + index * 0.1, duration: 0.5 }}
+                />
+              ))}
+
+              {[
+                { x: 120, y: 365, w: 20, h: 32, z: 16 },
+                { x: 143, y: 375, w: 18, h: 26, z: 13 },
+                { x: 163, y: 383, w: 16, h: 22, z: 11 },
+              ].map((building, index) => (
+                <motion.div
+                  key={`kochi-${index}`}
+                  className="absolute bg-gradient-to-br from-slate-500 to-slate-600 rounded-sm"
+                  style={{
+                    left: `${building.x}px`,
+                    top: `${building.y}px`,
+                    width: `${building.w}px`,
+                    height: `${building.h}px`,
+                    transform: `translateZ(${building.z}px)`,
+                    boxShadow: '6px 6px 15px rgba(0,0,0,0.6)',
+                  }}
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 1.5 + index * 0.1, duration: 0.5 }}
+                />
+              ))}
+
+              <motion.div
+                className="absolute text-4xl filter drop-shadow-2xl"
+                animate={{ offsetDistance: ['0%', '100%'] }}
+                transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
+                style={{ offsetPath: `path("${PATHS.train.d}")`, offsetRotate: '0deg' }}
+              >
+                🚆
+              </motion.div>
+
+              <motion.div
+                className="absolute text-3xl filter drop-shadow-xl"
+                animate={{
+                  x: [140, 280, 520, 540, 500, 340, 140],
+                  y: [380, 280, 180, 250, 410, 420, 380],
+                }}
+                transition={{
+                  duration: 20,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                  times: [0, 0.2, 0.4, 0.55, 0.7, 0.85, 1],
+                }}
+              >
+                🚗
+              </motion.div>
+
+              <motion.div
+                className="absolute text-3xl filter drop-shadow-xl"
+                style={{ left: '500px', top: '410px' }}
+                animate={{ y: [0, -5, 0], rotate: [-3, 3, -3] }}
+                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                🛶
+              </motion.div>
+
+              {LOCATIONS.map((location, index) => (
+                <motion.div
+                  key={location.id}
+                  className="absolute group cursor-pointer"
+                  style={{
+                    left: `${location.x}px`,
+                    top: `${location.y}px`,
+                    transformStyle: 'preserve-3d',
+                    transform: `translateZ(${location.z}px)`,
+                  }}
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 2 + index * 0.3, type: 'spring', stiffness: 200 }}
+                  onHoverStart={() => setActiveLocation(location.id)}
+                  onHoverEnd={() => setActiveLocation(null)}
+                >
+                  {[1, 2].map((ring) => (
+                    <motion.div
+                      key={ring}
+                      className="absolute -inset-4 rounded-full border-2"
+                      style={{ borderColor: location.glow, boxShadow: `0 0 20px ${location.glow}` }}
+                      animate={{ scale: [1, 1.5 + ring * 0.3, 1], opacity: [0.6, 0, 0.6] }}
+                      transition={{ duration: 3, repeat: Infinity, delay: ring * 0.5 + index * 0.2 }}
+                    />
+                  ))}
+
+                  <motion.div
+                    className="relative"
+                    whileHover={{ scale: 1.3, rotate: 5 }}
+                    transition={{ type: 'spring', stiffness: 300 }}
+                  >
+                    <div
+                      className="w-14 h-14 rounded-full flex items-center justify-center shadow-2xl border-2 border-white/20"
+                      style={{
+                        background: `linear-gradient(135deg, ${location.color}, ${location.glow})`,
+                        boxShadow: `0 0 30px ${location.glow}, 0 10px 25px rgba(0,0,0,0.4)`
+                      }}
+                    >
+                      <span className="text-3xl">{location.emoji}</span>
+                    </div>
+
+                    <div
+                      className="absolute -bottom-12 left-1/2 -translate-x-1/2 whitespace-nowrap text-center"
+                      style={{ textShadow: '0 2px 10px rgba(0,0,0,0.9)' }}
+                    >
+                      <div className="text-white text-base font-bold mb-0.5">{location.name}</div>
+                      <div className="text-slate-300 text-xs font-medium opacity-80">{location.subtitle}</div>
+                    </div>
+
+                    <AnimatePresence>
+                      {activeLocation === location.id && (
+                        <motion.div
+                          className="absolute -top-40 left-1/2 -translate-x-1/2 w-64 z-50"
+                          initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                          style={{ transform: 'translateZ(100px) translateX(-50%)' }}
+                        >
+                          <div className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 backdrop-blur-xl rounded-2xl p-5 border border-white/20 shadow-2xl">
+                            <div className="flex items-center gap-3 mb-3">
+                              <span className="text-4xl">{location.icon}</span>
+                              <div>
+                                <div className="text-white font-bold text-lg">{location.name}</div>
+                                <div className="text-slate-300 text-sm">{location.subtitle}</div>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2 text-sm text-slate-400 mb-3 pb-3 border-b border-white/10">
+                              <span>📅</span>
+                              <span>{location.date}</span>
+                              <span className="mx-1">•</span>
+                              <span>🕐</span>
+                              <span>{location.time}</span>
+                            </div>
+
+                            <div className="space-y-1.5">
+                              {location.activities.map((activity, activityIndex) => (
+                                <motion.div
+                                  key={activity}
+                                  className="flex items-center gap-2 text-sm text-slate-300"
+                                  initial={{ opacity: 0, x: -10 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  transition={{ delay: activityIndex * 0.1 }}
+                                >
+                                  <div
+                                    className="w-1.5 h-1.5 rounded-full"
+                                    style={{ backgroundColor: location.glow }}
+                                  />
+                                  {activity}
+                                </motion.div>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div
+                            className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 rotate-45 border-r border-b border-white/20"
+                            style={{
+                              background: 'linear-gradient(135deg, rgb(15 23 42 / 0.95), rgb(30 41 59 / 0.95))'
+                            }}
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                </motion.div>
+              ))}
+
+              {Array.from({ length: 6 }).map((_, index) => (
+                <motion.div
+                  key={`palm-${index}`}
+                  className="absolute text-2xl opacity-30"
+                  style={{
+                    left: `${440 + (index % 3) * 25}px`,
+                    top: `${380 + Math.floor(index / 3) * 20}px`,
+                    transform: 'translateZ(8px)',
+                  }}
+                  animate={{ rotate: [-5, 5, -5], scale: [1, 1.05, 1] }}
+                  transition={{ duration: 4 + index * 0.3, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  🌴
+                </motion.div>
+              ))}
+
+              {Array.from({ length: 4 }).map((_, index) => (
+                <motion.div
+                  key={`cloud-${index}`}
+                  className="absolute text-4xl opacity-10"
+                  style={{
+                    left: `${450 + index * 35}px`,
+                    top: `${140 + (index % 2) * 20}px`,
+                    transform: 'translateZ(40px)',
+                  }}
+                  animate={{ x: [-10, 10, -10], opacity: [0.05, 0.15, 0.05] }}
+                  transition={{ duration: 10 + index * 2, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  ☁️
+                </motion.div>
+              ))}
+
+              {Array.from({ length: 5 }).map((_, index) => (
+                <motion.div
+                  key={`bird-${index}`}
+                  className="absolute text-sm opacity-20"
+                  style={{
+                    left: `${200 + index * 100}px`,
+                    top: `${100 + index * 30}px`,
+                    transform: 'translateZ(50px)',
+                  }}
+                  animate={{ x: [0, 50, 0], y: [0, -20, 0] }}
+                  transition={{ duration: 6 + index, repeat: Infinity, ease: 'easeInOut', delay: index * 0.5 }}
+                >
+                  🦅
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1, duration: 0.8 }}
+        >
+          {[
+            { icon: '🚆', label: 'Train Distance', value: '1,350 km', color: 'purple' },
+            { icon: '🚗', label: 'Road Distance', value: '385 km', color: 'cyan' },
+            { icon: '📍', label: 'Destinations', value: '4 Cities', color: 'green' },
+            { icon: '📅', label: 'Duration', value: '5 Days', color: 'pink' },
+          ].map((stat) => (
+            <motion.div
+              key={stat.label}
+              className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 text-center"
+              whileHover={{ scale: 1.05, y: -5 }}
+              transition={{ type: 'spring', stiffness: 300 }}
+            >
+              <div className="text-4xl mb-2">{stat.icon}</div>
+              <div className={`text-3xl font-bold bg-gradient-to-r from-${stat.color}-400 to-${stat.color}-600 bg-clip-text text-transparent mb-1`}>
+                {stat.value}
+              </div>
+              <div className="text-sm text-slate-400">{stat.label}</div>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        <motion.div
+          className="flex flex-wrap justify-center gap-6 text-sm"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5 }}
+        >
+          <div className="flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full">
+            <div className="w-10 h-1 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500" />
+            <span className="text-slate-300">Train Journey</span>
+          </div>
+          <div className="flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full">
+            <div className="w-10 h-1 rounded-full bg-slate-500" />
+            <span className="text-slate-300">Road Route</span>
+          </div>
+          <div className="flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full">
+            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-purple-500 to-purple-700" />
+            <span className="text-slate-300">Major Stops</span>
+          </div>
+        </motion.div>
       </div>
     </div>
   )
