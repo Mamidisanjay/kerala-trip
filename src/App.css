@@ -73,6 +73,11 @@ button,
   opacity: 0.08;
 }
 
+.app-shell > * {
+  position: relative;
+  z-index: 2;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -940,7 +945,22 @@ svg.route-map {
 .memories-shelves {
   max-width: 1100px;
   margin: 3rem auto 4rem;
-  padding: 0.5rem 0 0;
+  padding: 1.2rem 1.2rem 1.6rem;
+  border-radius: 22px;
+  border: 1px solid rgba(0, 184, 156, 0.18);
+  background: rgba(4, 14, 8, 0.6);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  position: relative;
+  overflow: hidden;
+}
+
+.memories-shelves::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 15% 20%, rgba(0, 184, 156, 0.18), transparent 55%);
+  opacity: 0.6;
+  pointer-events: none;
 }
 
 .memories-sub {
@@ -948,6 +968,13 @@ svg.route-map {
   color: rgba(245, 240, 232, 0.45);
   font-size: 0.85rem;
   letter-spacing: 0.04em;
+}
+
+.memories-shelves .section-label,
+.memories-shelves .memories-title,
+.memories-shelves .memories-sub {
+  position: relative;
+  z-index: 2;
 }
 
 .packing-section {
@@ -1290,6 +1317,8 @@ svg.route-map {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
   gap: 1.2rem;
+  position: relative;
+  z-index: 2;
 }
 
 .memory-upload-card {
@@ -1312,6 +1341,13 @@ svg.route-map {
   margin-bottom: 0.8rem;
 }
 
+.memory-upload-count {
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  color: rgba(232, 200, 122, 0.7);
+  text-transform: uppercase;
+}
+
 .memory-upload-title {
   font-family: 'Playfair Display', serif;
   font-size: 1rem;
@@ -1329,7 +1365,7 @@ svg.route-map {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
-  justify-content: flex-end;
+  justify-content: flex-start;
   margin-top: 0.8rem;
 }
 
@@ -1351,6 +1387,11 @@ svg.route-map {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 6px 12px;
+}
+
+.memory-upload-btn:hover,
+.memory-upload-clear:hover {
+  border-color: rgba(232, 200, 122, 0.6);
 }
 
 .memory-upload-clear {
@@ -1695,14 +1736,23 @@ svg.route-map {
   height: 100vh;
   min-height: 640px;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
+  display: block;
   background:
     radial-gradient(circle at 50% 8%, rgba(0, 184, 156, 0.18), transparent 55%),
     radial-gradient(circle at 15% 85%, rgba(232, 200, 122, 0.12), transparent 55%),
     linear-gradient(180deg, rgba(4, 14, 8, 0.9) 0%, rgba(10, 31, 18, 0.96) 55%, rgba(4, 14, 8, 0.98) 100%);
+}
+
+.memories-carousel-frame {
+  position: relative;
+  z-index: 2;
+  width: min(1200px, 100%);
+  margin: 0 auto;
+  padding: 0 24px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
 
 .memories-carousel-bg {
@@ -1732,7 +1782,7 @@ svg.route-map {
   gap: 14px;
   flex-wrap: wrap;
   padding: 22px 24px 12px;
-  width: min(1100px, 100%);
+  width: 100%;
 }
 
 .memories-carousel-controls {
@@ -1768,17 +1818,16 @@ svg.route-map {
 
 .memories-carousel-desktop {
   position: relative;
-  width: min(1200px, 100%);
+  width: 100%;
   height: calc(100% - 130px);
-  margin: 0 auto;
   display: grid;
   place-items: center;
   padding: 0 54px 24px;
 }
 
 .ring-stage {
-  width: min(100%, 980px);
-  max-width: 980px;
+  width: min(100%, 1040px);
+  max-width: 1040px;
 }
 
 .memories-arrow {

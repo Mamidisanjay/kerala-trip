@@ -141,8 +141,8 @@ function CarouselSection() {
     velocityRef.current = 0
   }
 
-  const ringRadius = Math.max(220, Math.min(520, stageWidth * 0.38))
-  const cardWidth = Math.max(220, Math.min(460, stageWidth * 0.32))
+  const ringRadius = Math.max(240, Math.min(600, stageWidth * 0.42))
+  const cardWidth = Math.max(220, Math.min(520, stageWidth * 0.34))
   const cardHeight = Math.round(cardWidth * 0.56)
 
   return (
@@ -156,78 +156,80 @@ function CarouselSection() {
         <i className="orb orb-c" />
       </div>
 
-      <header className="memories-carousel-head">
-        <div className="badge">🎠 Infinite Memory Ring</div>
-        <div className="memories-carousel-controls">
-          <label className="memories-btn primary" htmlFor="memories-carousel-upload">Add Photos</label>
-          <input id="memories-carousel-upload" type="file" accept="image/*" multiple onChange={handleUpload} />
-          <button
-            type="button"
-            className="memories-btn"
-            onClick={() => setIsPaused((current) => !current)}
-          >
-            {isPaused ? 'Play' : 'Pause'}
-          </button>
-          <button type="button" className="memories-btn" onClick={clearAll}>Clear</button>
-        </div>
-      </header>
-
-      <div className="memories-carousel-desktop ring-desktop">
-        {slides.length > 0 ? (
-          <>
-            <button type="button" className="memories-arrow left" onClick={() => rotateByStep(-1)} aria-label="Rotate left">‹</button>
-
-            <div
-              ref={stageRef}
-              className="ring-stage"
-              onPointerDown={onPointerDown}
-              onPointerMove={onPointerMove}
-              onPointerUp={onPointerUp}
-              onPointerCancel={onPointerUp}
-              style={{
-                '--ring-radius': `${ringRadius}px`,
-                '--ring-card-width': `${cardWidth}px`,
-                '--ring-card-height': `${cardHeight}px`,
-              }}
+      <div className="memories-carousel-frame">
+        <header className="memories-carousel-head">
+          <div className="badge">🎠 Infinite Memory Ring</div>
+          <div className="memories-carousel-controls">
+            <label className="memories-btn primary" htmlFor="memories-carousel-upload">Add Photos</label>
+            <input id="memories-carousel-upload" type="file" accept="image/*" multiple onChange={handleUpload} />
+            <button
+              type="button"
+              className="memories-btn"
+              onClick={() => setIsPaused((current) => !current)}
             >
-              <div ref={ringRef} className="ring-core">
-                {slides.map((item, index) => (
-                  <article
-                    key={item.id}
-                    className="ring-card"
-                    style={{ transform: `rotateY(${index * stepDeg}deg) translateZ(var(--ring-radius))` }}
-                  >
-                    <div className="ring-card-media">
-                      <img src={item.image} alt="" className="ring-card-bg" aria-hidden="true" loading="lazy" />
-                      <img src={item.image} alt="Trip memory" className="ring-card-image" loading="lazy" />
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </div>
-
-            <button type="button" className="memories-arrow right" onClick={() => rotateByStep(1)} aria-label="Rotate right">›</button>
-          </>
-        ) : (
-          <div className="memories-empty">Upload any number of photos to spin your infinite cinematic ring.</div>
-        )}
-      </div>
-
-      <div className="memories-carousel-mobile ring-mobile">
-        {slides.length > 0 ? (
-          <div className="memories-mobile-track">
-            {slides.map((item) => (
-              <article key={item.id} className="memories-mobile-card">
-                <div className="ring-card-media">
-                  <img src={item.image} alt="" className="ring-card-bg" aria-hidden="true" loading="lazy" />
-                  <img src={item.image} alt="Trip memory" className="ring-card-image" loading="lazy" />
-                </div>
-              </article>
-            ))}
+              {isPaused ? 'Play' : 'Pause'}
+            </button>
+            <button type="button" className="memories-btn" onClick={clearAll}>Clear</button>
           </div>
-        ) : (
-          <div className="memories-empty">Upload photos to start swiping.</div>
-        )}
+        </header>
+
+        <div className="memories-carousel-desktop ring-desktop">
+          {slides.length > 0 ? (
+            <>
+              <button type="button" className="memories-arrow left" onClick={() => rotateByStep(-1)} aria-label="Rotate left">‹</button>
+
+              <div
+                ref={stageRef}
+                className="ring-stage"
+                onPointerDown={onPointerDown}
+                onPointerMove={onPointerMove}
+                onPointerUp={onPointerUp}
+                onPointerCancel={onPointerUp}
+                style={{
+                  '--ring-radius': `${ringRadius}px`,
+                  '--ring-card-width': `${cardWidth}px`,
+                  '--ring-card-height': `${cardHeight}px`,
+                }}
+              >
+                <div ref={ringRef} className="ring-core">
+                  {slides.map((item, index) => (
+                    <article
+                      key={item.id}
+                      className="ring-card"
+                      style={{ transform: `rotateY(${index * stepDeg}deg) translateZ(var(--ring-radius))` }}
+                    >
+                      <div className="ring-card-media">
+                        <img src={item.image} alt="" className="ring-card-bg" aria-hidden="true" loading="lazy" />
+                        <img src={item.image} alt="Trip memory" className="ring-card-image" loading="lazy" />
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </div>
+
+              <button type="button" className="memories-arrow right" onClick={() => rotateByStep(1)} aria-label="Rotate right">›</button>
+            </>
+          ) : (
+            <div className="memories-empty">Upload any number of photos to spin your infinite cinematic ring.</div>
+          )}
+        </div>
+
+        <div className="memories-carousel-mobile ring-mobile">
+          {slides.length > 0 ? (
+            <div className="memories-mobile-track">
+              {slides.map((item) => (
+                <article key={item.id} className="memories-mobile-card">
+                  <div className="ring-card-media">
+                    <img src={item.image} alt="" className="ring-card-bg" aria-hidden="true" loading="lazy" />
+                    <img src={item.image} alt="Trip memory" className="ring-card-image" loading="lazy" />
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="memories-empty">Upload photos to start swiping.</div>
+          )}
+        </div>
       </div>
     </section>
   )

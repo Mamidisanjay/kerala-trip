@@ -92,6 +92,7 @@ function Gallery() {
                 <div className="memory-upload-title">{shelf.title}</div>
                 <p className="memory-upload-caption">{shelf.caption}</p>
               </div>
+              <div className="memory-upload-count">{images.length} photos</div>
             </div>
             <div className="memory-upload-track" aria-label={`${shelf.title} uploads`}>
               {images.length ? (
