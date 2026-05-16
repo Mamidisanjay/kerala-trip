@@ -9,9 +9,30 @@ const PACKING_STORAGE_KEY = 'kerala-pack'
 const MOOD_STORAGE_KEY = 'kerala-vibe'
 
 const moodModes = [
-  { id: 'night', label: 'Classic Night', icon: '🌙', bg: '#0a1f12', rain: false },
-  { id: 'sunrise', label: 'Sunrise Glow', icon: '🌅', bg: '#1a0d04', rain: false },
-  { id: 'monsoon', label: 'Monsoon Drift', icon: '🌧', bg: '#050d14', rain: true },
+  {
+    id: 'night',
+    label: 'Classic Night',
+    icon: '🌙',
+    bg:
+      'radial-gradient(circle at 15% 20%, rgba(0,184,156,0.12), transparent 45%), radial-gradient(circle at 85% 10%, rgba(232,200,122,0.14), transparent 48%), linear-gradient(180deg, #040e08 0%, #0a1f12 45%, #040e08 100%)',
+    rain: false,
+  },
+  {
+    id: 'sunrise',
+    label: 'Sunrise Glow',
+    icon: '🌅',
+    bg:
+      'radial-gradient(circle at 20% 15%, rgba(240,160,48,0.22), transparent 50%), radial-gradient(circle at 85% 8%, rgba(224,96,48,0.18), transparent 55%), linear-gradient(180deg, #1b0c05 0%, #3d1b0d 50%, #0a1f12 100%)',
+    rain: false,
+  },
+  {
+    id: 'monsoon',
+    label: 'Monsoon Drift',
+    icon: '🌧',
+    bg:
+      'radial-gradient(circle at 20% 20%, rgba(46,110,166,0.22), transparent 52%), radial-gradient(circle at 80% 10%, rgba(0,184,156,0.12), transparent 55%), linear-gradient(180deg, #050d14 0%, #0a1f12 52%, #040b10 100%)',
+    rain: true,
+  },
 ]
 
 const facts = [
@@ -360,7 +381,7 @@ function App() {
   }
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell mood-${activeMood}`}>
       <div className={`rain ${moodInfo.rain ? 'active' : ''}`} id="rain">
         {rainDrops.map((drop) => (
           <div key={drop.id} className="rain-drop" style={drop.style} />
@@ -639,12 +660,13 @@ function App() {
               </div>
             ))}
           </div>
+        </div>
 
-          <div className="memories-upload">
-            <div className="section-label">Add Your Photos</div>
-            <h3 className="memories-title">Upload moments into your personal gallery</h3>
-            <Gallery />
-          </div>
+        <div className="memories-upload-zone">
+          <div className="section-label">Upload Memories</div>
+          <h3 className="memories-title">Friends & memories shelves</h3>
+          <p className="memories-sub">Add multiple photos per shelf. Scroll sideways to review each story.</p>
+          <Gallery />
         </div>
 
         <CarouselSection />
