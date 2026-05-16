@@ -662,7 +662,7 @@ function App() {
           </div>
         </div>
 
-        <div className="memories-upload-zone">
+        <div className="memories-shelves">
           <div className="section-label">Upload Memories</div>
           <h3 className="memories-title">Friends & memories shelves</h3>
           <p className="memories-sub">Add multiple photos per shelf. Scroll sideways to review each story.</p>

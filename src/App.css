@@ -48,6 +48,31 @@ button,
   min-height: 100vh;
 }
 
+.app-shell::before,
+.app-shell::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app-shell::before {
+  background:
+    radial-gradient(circle at 12% 18%, rgba(0, 184, 156, 0.18), transparent 32%),
+    radial-gradient(circle at 88% 12%, rgba(232, 200, 122, 0.16), transparent 34%),
+    radial-gradient(circle at 70% 70%, rgba(46, 110, 166, 0.12), transparent 38%);
+  opacity: 0.6;
+}
+
+.app-shell::after {
+  background-image:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 120px 120px;
+  opacity: 0.08;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -273,7 +298,7 @@ nav {
   position: absolute;
   bottom: 158px;
   left: -18%;
-  z-index: 3;
+  z-index: 6;
   animation: trainMove 18s linear infinite;
 }
 
@@ -912,14 +937,10 @@ svg.route-map {
   color: var(--cream);
 }
 
-.memories-upload-zone {
+.memories-shelves {
   max-width: 1100px;
   margin: 3rem auto 4rem;
-  padding: 2rem;
-  border-radius: 20px;
-  border: 1px solid rgba(0, 184, 156, 0.18);
-  background: rgba(4, 14, 8, 0.65);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  padding: 0.5rem 0 0;
 }
 
 .memories-sub {
@@ -1277,6 +1298,10 @@ svg.route-map {
   border-radius: 16px;
   padding: 1.1rem;
   box-shadow: inset 0 0 0 1px rgba(232, 200, 122, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  min-height: 240px;
 }
 
 .memory-upload-head {
@@ -1305,6 +1330,7 @@ svg.route-map {
   gap: 0.5rem;
   flex-wrap: wrap;
   justify-content: flex-end;
+  margin-top: 0.8rem;
 }
 
 .memory-upload-actions input {
@@ -1340,6 +1366,8 @@ svg.route-map {
   overflow-x: auto;
   padding-bottom: 8px;
   scroll-snap-type: x mandatory;
+  padding-right: 6px;
+  min-height: 120px;
 }
 
 .memory-upload-track::-webkit-scrollbar {
@@ -1377,6 +1405,7 @@ svg.route-map {
   font-size: 0.72rem;
   border: 1px dashed rgba(148, 163, 184, 0.3);
   border-radius: 12px;
+  width: 100%;
 }
 
 .gallery-shell {
@@ -1747,6 +1776,11 @@ svg.route-map {
   padding: 0 54px 24px;
 }
 
+.ring-stage {
+  width: min(100%, 980px);
+  max-width: 980px;
+}
+
 .memories-arrow {
   position: absolute;
   top: 50%;
@@ -1860,7 +1894,6 @@ svg.route-map {
 }
 
 .ring-stage {
-  width: 100%;
   height: 100%;
   position: relative;
   display: grid;

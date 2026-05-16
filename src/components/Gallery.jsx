@@ -92,17 +92,6 @@ function Gallery() {
                 <div className="memory-upload-title">{shelf.title}</div>
                 <p className="memory-upload-caption">{shelf.caption}</p>
               </div>
-              <div className="memory-upload-actions">
-                <label className="memory-upload-btn" htmlFor={inputId}>Upload</label>
-                <input
-                  id={inputId}
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={(event) => handleUpload(shelf.id, event)}
-                />
-                <button type="button" className="memory-upload-clear" onClick={() => clearShelf(shelf.id)}>Clear</button>
-              </div>
             </div>
             <div className="memory-upload-track" aria-label={`${shelf.title} uploads`}>
               {images.length ? (
@@ -114,6 +103,17 @@ function Gallery() {
               ) : (
                 <div className="memory-upload-empty">Drop memories here.</div>
               )}
+            </div>
+            <div className="memory-upload-actions">
+              <label className="memory-upload-btn" htmlFor={inputId}>Upload</label>
+              <input
+                id={inputId}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={(event) => handleUpload(shelf.id, event)}
+              />
+              <button type="button" className="memory-upload-clear" onClick={() => clearShelf(shelf.id)}>Clear</button>
             </div>
           </section>
         )

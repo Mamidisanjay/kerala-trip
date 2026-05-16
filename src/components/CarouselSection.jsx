@@ -141,8 +141,8 @@ function CarouselSection() {
     velocityRef.current = 0
   }
 
-  const ringRadius = Math.max(260, Math.min(760, stageWidth * 0.5))
-  const cardWidth = Math.max(240, Math.min(520, stageWidth * 0.34))
+  const ringRadius = Math.max(220, Math.min(520, stageWidth * 0.38))
+  const cardWidth = Math.max(220, Math.min(460, stageWidth * 0.32))
   const cardHeight = Math.round(cardWidth * 0.56)
 
   return (
